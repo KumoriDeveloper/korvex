@@ -337,7 +337,7 @@ async function loadMatches() {
         const list = await matchesAPI.getAll();
         const matches = Array.isArray(list) ? list : (list.matches || list.data || []);
         if (matches.length === 0) {
-            grid.innerHTML = '<p style="color: var(--text-muted); padding: 2rem;">Матчей пока нет.  </p>';
+            grid.innerHTML = '<p style="color: var(--text-muted); padding: 2rem;">Матчей пока нет.</p>';
             return;
         }
         grid.innerHTML = matches.map(m => {

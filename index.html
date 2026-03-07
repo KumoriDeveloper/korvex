@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korvex — Турниры и Статистика</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header__container">
+            <a href="index.html" class="logo">
+                <span class="logo__icon">◈</span>
+                <span class="logo__text">Korvex</span>
+            </a>
+            <nav class="nav">
+                <a href="#matches" class="nav__link active">Матчи</a>
+                <a href="rankings.html" class="nav__link">Рейтинг</a>
+                <a href="#tournaments" class="nav__link">Турниры</a>
+                <a href="#news" class="nav__link">Новости</a>
+                <a href="organizers.html" class="nav__link">Организаторы</a>
+            </nav>
+            <div class="header__actions">
+                <a href="register.html" class="btn btn--primary">Создать команду</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Боковые баннеры -->
+    <aside class="banner banner--left" id="banner-left"></aside>
+    <aside class="banner banner--right" id="banner-right"></aside>
+
+    <main class="main">
+        <section class="hero" id="heroSection">
+            <div class="hero__bg"></div>
+            <div class="hero__content" id="heroContent">
+                <span class="hero__badge">LIVE</span>
+                <h1 class="hero__title">Korvex Tournament</h1>
+                <p class="hero__subtitle">Турниры и матчи</p>
+                <div class="hero__match" id="heroMatch">
+                    <p style="color: var(--text-muted);">Загрузка...</p>
+                </div>
+                <a href="#matches" class="btn btn--primary btn--lg">Смотреть матчи</a>
+            </div>
+        </section>
+
+        <section id="matches" class="section">
+            <div class="container">
+                <div class="section__header">
+                    <h2 class="section__title">Матчи</h2>
+                    <div class="tabs">
+                        <button class="tab active">Все</button>
+                        <button class="tab">LIVE</button>
+                        <button class="tab">Предстоящие</button>
+                        <button class="tab">Завершённые</button>
+                    </div>
+                </div>
+                <div class="matches-grid" id="matchesGrid">
+                    <p style="color: var(--text-muted); padding: 2rem;">Загрузка матчей...</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="tournaments" class="section">
+            <div class="container">
+                <div class="section__header">
+                    <h2 class="section__title">Активные турниры</h2>
+                </div>
+                <div class="tournaments-grid" id="tournamentsGrid">
+                    <p style="color: var(--text-muted); padding: 2rem;">Загрузка турниров...</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="news" class="section section--dark">
+            <div class="container">
+                <div class="section__header">
+                    <h2 class="section__title">Новости</h2>
+                    <a href="#" class="link">Все новости →</a>
+                </div>
+                <div class="news-grid" id="newsGrid">
+                    <!-- Новости загружаются динамически из localStorage -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__brand">
+                    <span class="logo__icon">◈</span>
+                    <span>Korvex</span>
+                </div>
+                <div class="footer__links">
+                    <a href="#">О нас</a>
+                    <a href="#">Контакты</a>
+                    <a href="#">Правила</a>
+                    <a href="#">Партнёры</a>
+                </div>
+                <div class="footer__social">
+                    <a href="#">Twitter</a>
+                    <a href="#">Twitch</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+            <p class="footer__copy">© 2025 Korvex. Все права защищены.</p>
+            <div class="footer-bottom-banners" id="footerBottomBanners"></div>
+            <a href="admin-login.html" style="position: fixed; bottom: 0; right: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none;">Admin</a>
+        </div>
+    </footer>
+
+    <script src="api.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+

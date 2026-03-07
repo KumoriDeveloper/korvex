@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль команды — Korvex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .team-profile-page {
+            padding: 2rem 0;
+        }
+        .team-roster {
+            background: linear-gradient(180deg, var(--bg-card) 0%, transparent 50%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 3rem 2rem;
+            margin-bottom: 0;
+            overflow: hidden;
+            position: relative;
+            box-shadow: var(--shadow);
+        }
+        .team-roster::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(59, 130, 246, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .roster-players {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            min-height: 300px;
+            position: relative;
+            z-index: 1;
+        }
+        .roster-player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .roster-player:hover {
+            transform: translateY(-8px);
+        }
+        .roster-player:hover .roster-player__photo {
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.25);
+        }
+        .roster-player:hover .roster-player__nameplate {
+            background: linear-gradient(135deg, var(--accent) 0%, #2563eb 100%);
+            color: white;
+        }
+        .roster-player__photo {
+            width: 150px;
+            height: 190px;
+            object-fit: cover;
+            object-position: top center;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        .roster-player__nameplate {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-top: 1px solid rgba(255, 255, 255, 0.35);
+            color: var(--text-primary);
+            padding: 0.6rem 1.25rem;
+            margin-top: 2px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            min-width: 120px;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .roster-player__nameplate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        .roster-player:hover .roster-player__nameplate::before {
+            left: 100%;
+        }
+        .roster-player__nameplate span {
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.02em;
+        }
+        .roster-player__nameplate small {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+            font-weight: 500;
+        }
+        .roster-player:hover .roster-player__nameplate small {
+            color: rgba(255,255,255,0.9);
+        }
+        .map-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+        .map-stat {
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .map-stat__name {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .map-stat__winrate {
+            font-family: var(--font-mono);
+            font-weight: 700;
+        }
+        .map-stat--good {
+            border-color: var(--success);
+            background: linear-gradient(135deg, rgba(34,197,94,0.2), var(--bg-card));
+        }
+        .map-stat--mid {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245,158,11,0.18), var(--bg-card));
+        }
+        .map-stat--bad {
+            border-color: var(--danger);
+            background: linear-gradient(135deg, rgba(239,68,68,0.18), var(--bg-card));
+        }
+        .team-info-bar {
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, #0f1115 100%);
+            border: 1px solid var(--border);
+            border-top: 1px solid rgba(148, 163, 184, 0.12);
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            padding: 2rem 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+        .team-info-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .team-info-logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            padding: 8px;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+        }
+        .team-info-name h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+        .team-info-region {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .team-info-stats {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+        .team-stat {
+            text-align: center;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            min-width: 80px;
+        }
+        .team-stat__value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: var(--font-mono);
+        }
+        .team-stat__label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        .team-info-social {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .team-info-social a {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+        .team-info-social a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: var(--accent-muted);
+            transform: translateY(-2px);
+        }
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .section h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        .form-results {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .form-badge {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: var(--radius-md);
+            transition: transform 0.2s ease;
+        }
+        .form-badge:hover {
+            transform: scale(1.1);
+        }
+        .form-badge--win {
+            background: var(--success-muted);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        .form-badge--loss {
+            background: var(--danger-muted);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .form-badge--empty {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .stat-box {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            transition: all var(--transition);
+        }
+        .stat-box:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+        .stat-box__title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .stat-box__value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: var(--font-mono);
+        }
+        .map-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .map-stat {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+        }
+        .map-stat__name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .map-stat__winrate {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: var(--font-mono);
+        }
+        .achievements {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .achievement {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .achievement__icon {
+            font-size: 1.5rem;
+        }
+        .achievement__text {
+            font-size: 0.9rem;
+        }
+        .achievement__text strong {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+        }
+        .achievement__text small {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .recent-matches {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        .match-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all var(--transition);
+        }
+        .match-item:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+        }
+        .match-item__teams {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+        .match-item__team {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+        .match-item__score {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--accent);
+            margin: 0 0.5rem;
+        }
+        .match-item__result {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .match-item__result--win {
+            background: var(--success-muted);
+            color: var(--success);
+        }
+        .match-item__result--loss {
+            background: var(--danger-muted);
+            color: var(--danger);
+        }
+        .match-item__meta {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 768px) {
+            .roster-players {
+                flex-direction: column;
+                align-items: center;
+                gap: 2rem;
+            }
+            .team-info-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .team-info-stats {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .team-info-name h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header__container">
+            <a href="index.html" class="logo">
+                <span class="logo__icon">◈</span>
+                <span class="logo__text">Korvex</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html#matches" class="nav__link">Матчи</a>
+                <a href="rankings.html" class="nav__link">Рейтинг</a>
+                <a href="index.html#tournaments" class="nav__link">Турниры</a>
+                <a href="index.html#news" class="nav__link">Новости</a>
+                <a href="organizers.html" class="nav__link">Организаторы</a>
+            </nav>
+            <div class="header__actions">
+                <a href="register.html" class="btn btn--primary">Создать команду</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container team-profile-page">
+            <div id="teamProfile"></div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__brand">
+                    <span class="logo__icon">◈</span>
+                    <span>Korvex</span>
+                </div>
+                <div class="footer__links">
+                    <a href="#">О нас</a>
+                    <a href="#">Контакты</a>
+                    <a href="#">Правила</a>
+                    <a href="#">Партнёры</a>
+                </div>
+                <div class="footer__social">
+                    <a href="#">Twitter</a>
+                    <a href="#">Twitch</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+            <p class="footer__copy">© 2025 Korvex. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="api.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const teamId = urlParams.get('id');
+        
+        async function loadTeamProfile() {
+            try {
+                const teams = await rankingTeamsAPI.getAll();
+                const team = teams.find(t => t.id === parseInt(teamId));
+                const place = team ? (teams.findIndex(t => t.id === parseInt(teamId)) + 1) : 0;
+                const teamRating = team ? (Number(team.rating) ?? team.points ?? 0) : 0;
+            
+            const container = document.getElementById('teamProfile');
+            
+            if (!team) {
+                container.innerHTML = '<div class="empty-state"><h2>Команда не найдена</h2></div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="team-roster">
+                    <div class="roster-players" id="teamPlayers"></div>
+                    <div class="team-info-bar">
+                        <div class="team-info-left">
+                            <img src="${team.logo || 'img/avatar/avatar.png'}" alt="${team.team_name}" class="team-info-logo">
+                            <div class="team-info-name">
+                                <h1>${team.team_name}</h1>
+                                <div class="team-info-region">Место в рейтинге: ${place} · Рейтинг: ${Math.round(teamRating)}</div>
+                            </div>
+                        </div>
+                        <div class="team-info-stats">                            
+                        </div>
+                        <div class="team-info-social">
+                            <a href="#" title="Twitter/X" aria-label="Twitter">𝕏</a>
+                            <a href="#" title="Twitch" aria-label="Twitch">▶</a>
+                            <a href="#" title="Instagram" aria-label="Instagram">📷</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="section">
+                    <h2>Последние результаты</h2>
+                    <div class="form-results">
+                        ${(Array.isArray(team.form) ? team.form : (typeof team.form === 'string' ? String(team.form).split(',').filter(Boolean) : [])).map(f => {
+                            if (f === 'W') return '<span class="form-badge form-badge--win">W</span>';
+                            if (f === 'L') return '<span class="form-badge form-badge--loss">L</span>';
+                            return '<span class="form-badge form-badge--empty">—</span>';
+                        }).join('')}
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Статистика команды</h2>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-box__title">Процент побед</div>
+                            <div class="stat-box__value">${(() => { const formArr = Array.isArray(team.form) ? team.form : (typeof team.form === 'string' ? String(team.form).split(',').filter(Boolean) : []); return team.matches > 0 && formArr.length > 0 ? Math.round((formArr.filter(f => f === 'W').length / formArr.length) * 100) : 0; })()}%</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box__title">Средний рейтинг</div>
+                            <div class="stat-box__value" id="avgRating">—</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box__title">Рейтинг (очки)</div>
+                            <div class="stat-box__value">${Math.round(teamRating)}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box__title">Место в рейтинге</div>
+                            <div class="stat-box__value">${place}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Статистика по картам</h2>
+                    <div class="map-stats" id="mapStats"></div>
+                </div>
+                
+                <div class="section">
+                    <h2>Достижения</h2>
+                    <div class="achievements" id="achievements"></div>
+                </div>
+                
+                <div class="section">
+                    <h2>Последние матчи</h2>
+                    <div class="recent-matches" id="recentMatches"></div>
+                </div>
+            `;
+            
+                // Загрузить игроков команды
+                loadTeamPlayers(team);
+                
+                // Загрузить детали команды (передаём id и название команды)
+                loadTeamDetails(team.id, team.team_name);
+                
+                // Средний рейтинг игроков
+                loadAverageRating(team.id);
+            } catch (error) {
+                console.error('Ошибка загрузки профиля команды:', error);
+                document.getElementById('teamProfile').innerHTML = '<div class="empty-state"><h2>Ошибка загрузки данных</h2></div>';
+            }
+        }
+        
+        async function loadTeamDetails(teamId, teamName) {
+            try {
+                const details = await teamDetailsAPI.get(teamId);
+            
+                // Статистика по картам: все 7 карт и винрейт на каждой
+                const mapStats = details.mapStats || {};
+                const maps = [
+                    { name: 'Mirage', key: 'mirage' },
+                    { name: 'Inferno', key: 'inferno' },
+                    { name: 'Nuke', key: 'nuke' },
+                    { name: 'Dust 2', key: 'dust2' },
+                    { name: 'Overpass', key: 'overpass' },
+                    { name: 'Ancient', key: 'ancient' },
+                    { name: 'Anubis', key: 'anubis' }
+                ];
+                
+                const mapStatsContainer = document.getElementById('mapStats');
+                if (mapStatsContainer) {
+                    mapStatsContainer.innerHTML = maps.map(map => {
+                        const winrate = mapStats[map.key];
+                        const value = (winrate !== undefined && winrate !== null && winrate !== '') ? Number(winrate) : null;
+                        const display = value != null ? value + '%' : '—';
+                        const boxCls = value == null ? '' : (value >= 55 ? ' map-stat--good' : (value >= 50 ? ' map-stat--mid' : ' map-stat--bad'));
+                        return `
+                            <div class="map-stat${boxCls}">
+                                <div class="map-stat__name">${map.name}</div>
+                                <div class="map-stat__winrate">${display}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                // Загрузить достижения
+                const achievements = details.achievements || [];
+                const achievementsContainer = document.getElementById('achievements');
+                if (achievementsContainer) {
+                    if (achievements.length === 0) {
+                        achievementsContainer.innerHTML = '<p style="color: var(--text-muted);">Нет достижений</p>';
+                    } else {
+                        achievementsContainer.innerHTML = achievements.map(ach => `
+                            <div class="achievement">
+                                <div class="achievement__text">
+                                    <strong>${ach.title}</strong>
+                                    ${ach.description ? `<small>${ach.description}</small>` : ''}
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+                
+                // Загрузить матчи: сначала с API (реальные завершённые), иначе из деталей команды
+                const matchesContainer = document.getElementById('recentMatches');
+                if (matchesContainer) {
+                    let matchesToShow = details.matches || [];
+                    try {
+                        const allMatches = typeof matchesAPI !== 'undefined' ? await matchesAPI.getAll() : [];
+                        const teamFinished = (allMatches || []).filter(m => (m.team1_name === teamName || m.team2_name === teamName) && (m.status === 'finished'));
+                        const recentReal = teamFinished.slice(0, 10).map(m => {
+                            const is1 = m.team1_name === teamName;
+                            const our = is1 ? m.score1 : m.score2;
+                            const opp = is1 ? m.score2 : m.score1;
+                            const opponent = is1 ? (m.team2_name || '—') : (m.team1_name || '—');
+                            const score = (our != null && opp != null) ? our + ' : ' + opp : '—';
+                            const result = (our != null && opp != null && our > opp) ? 'win' : 'loss';
+                            return { id: m.id, score, opponent, result, map: m.map_name || '', date: m.date_time || '' };
+                        });
+                        if (recentReal.length > 0) matchesToShow = recentReal;
+                    } catch (e) {}
+                    const matches = matchesToShow;
+                    const name = teamName || 'Команда';
+                    if (matches.length === 0) {
+                        matchesContainer.innerHTML = '<p style="color: var(--text-muted);">Нет матчей</p>';
+                    } else {
+                        matchesContainer.innerHTML = matches.map(match => {
+                            const clickable = match.id != null;
+                            const onClick = clickable ? `onclick="window.location.href='match-stats.html?id=${match.id}'"` : '';
+                            const cursor = clickable ? 'cursor: pointer;' : '';
+                            return `
+                            <div class="match-item" style="${cursor}" ${onClick}>
+                                <div class="match-item__teams">
+                                    <div class="match-item__team">${name}</div>
+                                    <div class="match-item__score">${match.score || '—'}</div>
+                                    <div class="match-item__team">${match.opponent || 'Соперник'}</div>
+                                </div>
+                                <div class="match-item__result match-item__result--${match.result || 'win'}">${match.result === 'win' ? 'Победа' : 'Поражение'}</div>
+                                <div class="match-item__meta">${match.map || ''}${match.map && match.date ? ' • ' : ''}${match.date || ''}</div>
+                            </div>
+                            `;
+                        }).join('');
+                    }
+                }
+                
+                // Обновить регион и социальные сети
+                if (details.region) {
+                    const regionElement = document.querySelector('.team-info-region');
+                    if (regionElement) {
+                        regionElement.textContent = details.region;
+                    }
+                }
+                
+                if (details.social) {
+                    const social = details.social;
+                    const socialLinks = document.querySelectorAll('.team-info-social a');
+                    if (socialLinks.length >= 3) {
+                        if (social.twitter) socialLinks[0].href = social.twitter;
+                        if (social.twitch) socialLinks[1].href = social.twitch;
+                        if (social.instagram) socialLinks[2].href = social.instagram;
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки деталей команды:', error);
+            }
+        }
+        
+        async function loadAverageRating(teamId) {
+            try {
+                const players = await rankingPlayersAPI.getAll();
+                const teamPlayers = players.filter(p => p.team_id === parseInt(teamId));
+                if (teamPlayers.length > 0) {
+                    const avgRating = teamPlayers.reduce((sum, p) => sum + (p.rating || 0), 0) / teamPlayers.length;
+                    const avgRatingElement = document.getElementById('avgRating');
+                    if (avgRatingElement) avgRatingElement.textContent = avgRating.toFixed(2);
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки среднего рейтинга:', e);
+            }
+        }
+        
+        async function loadTeamPlayers(team) {
+            try {
+                const rankingPlayers = await rankingPlayersAPI.getAll();
+                
+                // Найти игроков команды по team_id
+                const teamPlayers = rankingPlayers.filter(p => p.team_id === team.id);
+                
+                const container = document.getElementById('teamPlayers');
+                
+            if (teamPlayers.length === 0) {
+                container.innerHTML = '<div class="empty-state">Нет игроков в команде</div>';
+                return;
+            }
+            
+            // Сортировка по рейтингу
+            teamPlayers.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+            
+            container.innerHTML = teamPlayers.map(player => {
+                const avatarSrc = !player.avatar || player.avatar.includes('api.dicebear.com/7.x/avataaars')
+                    ? 'img/avatar/avatar.png'
+                    : player.avatar;
+                
+                return `
+                    <div class="roster-player" onclick="window.location.href='player-profile.html?id=${player.id}'">
+                        <img src="${avatarSrc}" alt="${player.player_name || player.nickname}" class="roster-player__photo">
+                        <div class="roster-player__nameplate">
+                            <span>${player.nickname || player.nickname}</span>
+                            <small>Rating ${(player.rating || 0).toFixed(2)}</small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            } catch (error) {
+                console.error('Ошибка загрузки игроков команды:', error);
+                document.getElementById('teamPlayers').innerHTML = '<div class="empty-state">Ошибка загрузки игроков</div>';
+            }
+        }
+        
+        loadTeamProfile();
+    </script>
+</body>
+</html>
+

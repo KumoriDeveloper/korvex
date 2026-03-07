@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Турнир — Korvex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header__container">
+            <a href="index.html" class="logo">
+                <span class="logo__icon">◈</span>
+                <span class="logo__text">Korvex</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html#matches" class="nav__link">Матчи</a>
+                <a href="rankings.html" class="nav__link">Рейтинг</a>
+                <a href="index.html#tournaments" class="nav__link active">Турниры</a>
+                <a href="index.html#news" class="nav__link">Новости</a>
+                <a href="organizers.html" class="nav__link">Организаторы</a>
+            </nav>
+            <div class="header__actions">
+                <a href="register.html" class="btn btn--primary">Создать команду</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main tournament-main">
+        <section class="section">
+            <div class="container">
+                <div class="tournament-header">
+                    <h1 class="tournament-header__title" id="tournamentTitle">Турнир</h1>
+                    <p class="tournament-header__meta" id="tournamentMeta"></p>
+                </div>
+
+                <!-- Компактный блок: Информация о турнире -->
+                <div id="tournamentInfoBlock" class="tournament-info-block">
+                    <h2 class="tournament-info-block__title">Информация о турнире</h2>
+                    <div id="tournamentInfoContent" class="tournament-info-block__content"></div>
+                </div>
+
+                <!-- Участники -->
+                <div id="tournamentParticipantsWrap" class="tournament-section">
+                    <h2 class="tournament-section__title">Участники</h2>
+                    <div id="teamsAttending" class="teams-grid"></div>
+                </div>
+
+                <!-- Оставлены только информация и участники турнира -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__brand">
+                    <span class="logo__icon">◈</span>
+                    <span>Korvex</span>
+                </div>
+                <div class="footer__links">
+                    <a href="#">О нас</a>
+                    <a href="#">Контакты</a>
+                    <a href="#">Правила</a>
+                    <a href="#">Партнёры</a>
+                </div>
+                <div class="footer__social">
+                    <a href="#">Twitter</a>
+                    <a href="#">Twitch</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+            <p class="footer__copy">© 2025 Korvex. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="api.js"></script>
+    <script src="tournament-page.js"></script>
+</body>
+</html>

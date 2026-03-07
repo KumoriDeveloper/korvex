@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистика матча — Korvex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .match-stats-page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .match-stats-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 2rem;
+        }
+        .match-stats-header__team {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 180px;
+        }
+        .match-stats-header__team--right { flex-direction: row-reverse; text-align: right; }
+        .match-stats-header__logo { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; }
+        .match-stats-header__score { font-family: var(--font-mono); font-size: 2rem; font-weight: 700; color: var(--text-primary); }
+        .match-stats-header__center { text-align: center; }
+        .match-stats-header__date { color: var(--text-muted); font-size: 0.9rem; }
+        .match-stats-header__tournament { color: var(--text-secondary); margin-top: 0.25rem; }
+        .match-stats-header__format { font-size: 0.8rem; color: var(--accent); margin-top: 0.25rem; }
+        .match-stats-header__status { margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted); }
+        .match-stats-header__watch { margin-top: 1rem; display: flex; justify-content: center; }
+        .match-stats-header__watch .btn { width: 100%; max-width: 220px; justify-content: center; }
+        .match-stats-maps { margin-bottom: 2rem; }
+        .match-stats-maps__title { font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem; }
+        .match-stats-maps__list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .map-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .map-card__name { font-weight: 600; font-size: 1.1rem; }
+        .map-card__score { display: flex; align-items: center; gap: 1rem; font-family: var(--font-mono); font-size: 1.1rem; }
+        .match-stats-section { margin-bottom: 2rem; }
+        .match-stats-section__title { font-size: 1.25rem; margin-bottom: 1.25rem; }
+        .match-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        @media (max-width: 900px) { .match-stats-grid { grid-template-columns: 1fr; } }
+        .team-stats { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+        .team-stats__header { padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+        .team-stats__header .rating-change { margin-left: auto; }
+        .team-stats__logo { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; }
+        .team-stats__name { font-weight: 600; }
+        .team-stats table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .team-stats th, .team-stats td { padding: 0.6rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        .team-stats th { color: var(--text-muted); font-weight: 500; }
+        .team-stats .col-kd { font-family: var(--font-mono); }
+        .team-stats .col-swing--pos { color: var(--success); }
+        .team-stats .col-swing--neg { color: var(--danger); }
+        .team-stats .col-rating--high { color: var(--success); }
+        .team-stats .col-rating--low { color: var(--danger); }
+        .team-stats .col-player--link { color: var(--accent); text-decoration: none; }
+        .team-stats .col-player--link:hover { text-decoration: underline; }
+        .rating-change { font-family: var(--font-mono); font-weight: 700; font-size: 0.95rem; }
+        .rating-change--plus { color: var(--success); }
+        .rating-change--minus { color: var(--danger); }
+        .rating-change--zero { color: var(--text-muted); }
+        .match-stats-back { display: inline-block; margin-bottom: 1.5rem; color: var(--accent); }
+        .match-stats-back:hover { color: var(--accent-hover); }
+        .match-stats-loading, .match-stats-error { padding: 3rem; text-align: center; color: var(--text-muted); }
+        .match-stats-error { color: var(--danger); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header__container">
+            <a href="index.html" class="logo">
+                <span class="logo__icon">◈</span>
+                <span class="logo__text">Korvex</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html#matches" class="nav__link">Матчи</a>
+                <a href="rankings.html" class="nav__link">Рейтинг</a>
+                <a href="index.html#tournaments" class="nav__link">Турниры</a>
+                <a href="index.html#news" class="nav__link">Новости</a>
+                <a href="organizers.html" class="nav__link">Организаторы</a>
+            </nav>
+            <div class="header__actions">
+                <a href="register.html" class="btn btn--primary">Создать команду</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="match-stats-page">
+            <a href="index.html#matches" class="match-stats-back">← Назад к матчам</a>
+            <div id="matchStatsRoot">
+                <div class="match-stats-loading">Загрузка...</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="api.js"></script>
+    <script>
+        (function() {
+            const DEFAULT_LOGO = 'https://via.placeholder.com/48?text=?';
+            function escapeHtml(s) {
+                if (s == null) return '';
+                const div = document.createElement('div');
+                div.textContent = s;
+                return div.innerHTML;
+            }
+            function getParam(name) {
+                const params = new URLSearchParams(window.location.search);
+                return params.get(name);
+            }
+            function formatDate(dateStr) {
+                if (!dateStr) return '—';
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
+            function safeExternalUrl(raw) {
+                const s = (raw || '').toString().trim();
+                if (!s) return null;
+                try {
+                    const u = new URL(s);
+                    if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
+                    return u.toString();
+                } catch (e) {
+                    return null;
+                }
+            }
+            function ratingClass(r) {
+                if (r == null) return '';
+                const v = Number(r);
+                if (v > 1.25) return ' col-rating--high';
+                if (v < 0.95) return ' col-rating--low';
+                return '';
+            }
+            function swingClass(s) {
+                if (s == null) return '';
+                const v = Number(s);
+                if (v > 0) return ' col-swing--pos';
+                if (v < 0) return ' col-swing--neg';
+                return '';
+            }
+            function swingText(s) {
+                if (s == null) return '—';
+                const v = Number(s);
+                if (v > 0) return '+' + v.toFixed(2) + '%';
+                return v.toFixed(2) + '%';
+            }
+
+            const root = document.getElementById('matchStatsRoot');
+            const matchId = getParam('id');
+            if (!matchId) {
+                root.innerHTML = '<div class="match-stats-error">Не указан матч (id).</div>';
+                root.className = '';
+                return;
+            }
+
+            Promise.all([
+                matchesAPI.getOne(matchId),
+                matchesAPI.getStats(matchId),
+                typeof rankingTeamsAPI !== 'undefined' ? rankingTeamsAPI.getAll() : [],
+                typeof rankingPlayersAPI !== 'undefined' ? rankingPlayersAPI.getAll() : [],
+                (matchesAPI.getRatingChanges ? matchesAPI.getRatingChanges(matchId).catch(function() { return null; }) : Promise.resolve(null))
+            ]).then(function(results) {
+                const match = results[0];
+                const stats = Array.isArray(results[1]) ? results[1] : (results[1].stats || []);
+                const teams = Array.isArray(results[2]) ? results[2] : [];
+                const players = Array.isArray(results[3]) ? results[3] : [];
+                const ratingChanges = results[4] || null;
+                const team1StatsRaw = stats.filter(function(s) { return Number(s.team_side) === 1; }).sort(function(a, b) { return (a.sort_order || 0) - (b.sort_order || 0); });
+                const team2StatsRaw = stats.filter(function(s) { return Number(s.team_side) === 2; }).sort(function(a, b) { return (a.sort_order || 0) - (b.sort_order || 0); });
+
+                function normTeam(s) { return (s || '').trim().toLowerCase().replace(/\s+/g, ''); }
+                var team1 = teams.find(function(t) { return normTeam(t.team_name) === normTeam(match.team1_name); });
+                var team2 = teams.find(function(t) { return normTeam(t.team_name) === normTeam(match.team2_name); });
+                var team1Players = team1 ? players.filter(function(p) { return Number(p.team_id) === Number(team1.id); }) : [];
+                var team2Players = team2 ? players.filter(function(p) { return Number(p.team_id) === Number(team2.id); }) : [];
+
+                function mergeRosterWithStats(teamStatsRaw, rosterPlayers) {
+                    var rows = [];
+                    for (var i = 0; i < 5; i++) {
+                        var saved = teamStatsRaw[i] || {};
+                        var name = (saved.player_name || '').trim() || (rosterPlayers[i] ? (rosterPlayers[i].player_name || rosterPlayers[i].nickname || '').trim() : '');
+                        rows.push({
+                            player_name: name || '—',
+                            kills: saved.kills,
+                            deaths: saved.deaths,
+                            adr: saved.adr,
+                            kast: saved.kast,
+                            rating_30: saved.rating_30,
+                            swing: saved.swing
+                        });
+                    }
+                    return rows;
+                }
+                var team1Stats = mergeRosterWithStats(team1StatsRaw, team1Players);
+                var team2Stats = mergeRosterWithStats(team2StatsRaw, team2Players);
+
+                function getPlayerIdForStat(stat, teamName) {
+                    if (!teamName || !(stat.player_name || '').trim() || (stat.player_name || '').trim() === '—') return null;
+                    var team = teams.find(function(t) { return normTeam(t.team_name) === normTeam(teamName); });
+                    if (!team) return null;
+                    var name = (stat.player_name || '').trim().toLowerCase();
+                    var player = players.find(function(p) {
+                        if (Number(p.team_id) !== Number(team.id)) return false;
+                        var pn = (p.player_name || '').trim().toLowerCase();
+                        var nick = (p.nickname || '').trim().toLowerCase();
+                        return pn === name || nick === name;
+                    });
+                    return player ? player.id : null;
+                }
+
+                const logo1 = match.team1_logo || DEFAULT_LOGO;
+                const logo2 = match.team2_logo || DEFAULT_LOGO;
+                const statusLabel = (match.status || '').toLowerCase() === 'live' ? 'LIVE' : ((match.status || '').toLowerCase() === 'finished' || (match.status || '').toLowerCase() === 'завершён' ? 'Матч завершён' : 'Предстоящий');
+                const dateStr = formatDate(match.date_time);
+                const formatLabel = (match.format || 'bo1').toUpperCase();
+                const maps = match.maps && match.maps.length ? match.maps : (match.map_name ? [{ map_name: match.map_name, score1: match.score1, score2: match.score2 }] : []);
+                const streamUrl = safeExternalUrl(match.stream_url);
+
+                function formatRatingChange(change) {
+                    if (change == null) return { html: '', cls: '' };
+                    var n = Number(change);
+                    if (n > 0) return { html: '+' + n, cls: 'rating-change--plus' };
+                    if (n < 0) return { html: String(n), cls: 'rating-change--minus' };
+                    return { html: '0', cls: 'rating-change--zero' };
+                }
+                var rc1 = ratingChanges ? formatRatingChange(ratingChanges.team1_change) : { html: '', cls: '' };
+                var rc2 = ratingChanges ? formatRatingChange(ratingChanges.team2_change) : { html: '', cls: '' };
+                var ratingChangeBlock1 = rc1.html ? ('<div class="rating-change ' + rc1.cls + '">' + escapeHtml(rc1.html) + ' очков</div>') : '';
+                var ratingChangeBlock2 = rc2.html ? ('<div class="rating-change ' + rc2.cls + '">' + escapeHtml(rc2.html) + ' очков</div>') : '';
+
+                function renderTable(teamStats, teamName, teamLogo) {
+                    if (!teamStats.length) {
+                        return '<table><thead><tr><th>Игрок</th><th>K-D</th><th>Swing</th><th>ADR</th><th>KAST</th><th>Rating 1.0</th></tr></thead><tbody><tr><td colspan="6" style="color: var(--text-muted); padding: 1rem;">Нет данных</td></tr></tbody></table>';
+                    }
+                    const rows = teamStats.map(function(p) {
+                        const kd = (p.kills != null && p.deaths != null) ? (p.kills + '-' + p.deaths) : '—';
+                        const adr = p.adr != null ? Number(p.adr).toFixed(1) : '—';
+                        const kast = p.kast != null ? Number(p.kast).toFixed(1) + '%' : '—';
+                        const rating = p.rating_30 != null ? Number(p.rating_30).toFixed(2) : '—';
+                        const rClass = ratingClass(p.rating_30);
+                        const sClass = swingClass(p.swing);
+                        const swingStr = swingText(p.swing);
+                        var playerId = getPlayerIdForStat(p, teamName);
+                        var nameCell = playerId
+                            ? '<a href="player-profile.html?id=' + encodeURIComponent(playerId) + '" class="col-player col-player--link">' + escapeHtml(p.player_name || '—') + '</a>'
+                            : escapeHtml(p.player_name || '—');
+                        return '<tr><td class="col-player">' + nameCell + '</td><td class="col-kd">' + escapeHtml(kd) + '</td><td class="col-swing' + sClass + '">' + escapeHtml(swingStr) + '</td><td>' + escapeHtml(adr) + '</td><td>' + escapeHtml(kast) + '</td><td class="col-rating' + rClass + '">' + escapeHtml(rating) + '</td></tr>';
+                    }).join('');
+                    return '<table><thead><tr><th>Игрок</th><th>K-D</th><th>Swing</th><th>ADR</th><th>KAST</th><th>Rating 1.0</th></tr></thead><tbody>' + rows + '</tbody></table>';
+                }
+
+                root.innerHTML =
+                    '<div class="match-stats-header">' +
+                    '  <div class="match-stats-header__team">' +
+                    '    <img src="' + escapeHtml(logo1) + '" alt="" class="match-stats-header__logo" onerror="this.src=\'' + DEFAULT_LOGO + '\'">' +
+                    '    <div><div class="match-stats-header__name">' + escapeHtml(match.team1_name || '—') + '</div><div class="match-stats-header__score">' + (match.score1 != null ? match.score1 : '—') + '</div>' + ratingChangeBlock1 + '</div>' +
+                    '  </div>' +
+                    '  <div class="match-stats-header__center">' +
+                    '    <div class="match-stats-header__date">' + escapeHtml(dateStr) + '</div>' +
+                    '    <div class="match-stats-header__tournament">' + escapeHtml(match.tournament_name || '—') + '</div>' +
+                    '    <div class="match-stats-header__format">' + escapeHtml(formatLabel) + '</div>' +
+                    '    <div class="match-stats-header__status">' + escapeHtml(statusLabel) + '</div>' +
+                    (streamUrl ? ('    <div class="match-stats-header__watch"><a class="btn btn--primary" href="' + escapeHtml(streamUrl) + '" target="_blank" rel="noopener noreferrer">Смотреть матч</a></div>') : '') +
+                    '  </div>' +
+                    '  <div class="match-stats-header__team match-stats-header__team--right">' +
+                    '    <img src="' + escapeHtml(logo2) + '" alt="" class="match-stats-header__logo" onerror="this.src=\'' + DEFAULT_LOGO + '\'">' +
+                    '    <div><div class="match-stats-header__name">' + escapeHtml(match.team2_name || '—') + '</div><div class="match-stats-header__score">' + (match.score2 != null ? match.score2 : '—') + '</div>' + ratingChangeBlock2 + '</div>' +
+                    '  </div>' +
+                    '</div>' +
+
+                    (maps.length ? ('<section class="match-stats-maps"><h3 class="match-stats-maps__title">Карты</h3><div class="match-stats-maps__list">' + maps.map(function(m) {
+                        return '<div class="map-card"><span class="map-card__name">' + escapeHtml(m.map_name || '—') + '</span><div class="map-card__score"><span>' + (m.score1 != null ? m.score1 : '—') + '</span><span>:</span><span>' + (m.score2 != null ? m.score2 : '—') + '</span></div></div>';
+                    }).join('') + '</div></section>') : '') +
+
+                    '<section class="match-stats-section">' +
+                    '  <h2 class="match-stats-section__title">Статистика матча</h2>' +
+                    '  <div class="match-stats-grid">' +
+                    '    <div class="team-stats">' +
+                    '      <div class="team-stats__header"><img src="' + escapeHtml(logo1) + '" alt="" class="team-stats__logo" onerror="this.src=\'' + DEFAULT_LOGO + '\'"><span class="team-stats__name">' + escapeHtml(match.team1_name || 'Команда 1') + '</span>' + (rc1.html ? '<span class="rating-change ' + rc1.cls + '">' + escapeHtml(rc1.html) + ' очков</span>' : '') + '</div>' +
+                    renderTable(team1Stats, match.team1_name, logo1) +
+                    '    </div>' +
+                    '    <div class="team-stats">' +
+                    '      <div class="team-stats__header"><img src="' + escapeHtml(logo2) + '" alt="" class="team-stats__logo" onerror="this.src=\'' + DEFAULT_LOGO + '\'"><span class="team-stats__name">' + escapeHtml(match.team2_name || 'Команда 2') + '</span>' + (rc2.html ? '<span class="rating-change ' + rc2.cls + '">' + escapeHtml(rc2.html) + ' очков</span>' : '') + '</div>' +
+                    renderTable(team2Stats, match.team2_name, logo2) +
+                    '    </div>' +
+                    '  </div>' +
+                    '</section>';
+                root.className = '';
+            }).catch(function(err) {
+                console.error(err);
+                root.innerHTML = '<div class="match-stats-error">Не удалось загрузить матч или сервер недоступен.</div>';
+                root.className = '';
+            });
+        })();
+    </script>
+</body>
+</html>

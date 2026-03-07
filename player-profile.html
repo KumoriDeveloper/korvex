@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль игрока — Korvex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        .player-profile-page { padding: 2rem 0; }
+        .profile-kpi {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .profile-kpi__item {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-tertiary) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            text-align: center;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+        }
+        .profile-kpi__item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        .profile-kpi__item--low {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, var(--bg-tertiary) 100%);
+            animation: kpi-pulse-low 2s ease-in-out infinite;
+        }
+        .profile-kpi__item--low .profile-kpi__value { color: var(--danger); }
+        .profile-kpi__item--high {
+            border-color: rgba(34, 197, 94, 0.4);
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, var(--bg-tertiary) 100%);
+            animation: kpi-pulse-high 2s ease-in-out infinite;
+        }
+        .profile-kpi__item--high .profile-kpi__value { color: var(--success); }
+        .profile-kpi__item--orange {
+            border-color: rgba(249, 115, 22, 0.45);
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.12) 0%, var(--bg-tertiary) 100%);
+            animation: kpi-pulse-orange 2s ease-in-out infinite;
+        }
+        .profile-kpi__item--orange .profile-kpi__value { color: #f97316; }
+        .profile-kpi__item--yellow {
+            border-color: rgba(234, 179, 8, 0.45);
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.12) 0%, var(--bg-tertiary) 100%);
+            animation: kpi-pulse-yellow 2s ease-in-out infinite;
+        }
+        .profile-kpi__item--yellow .profile-kpi__value { color: #eab308; }
+        @keyframes kpi-pulse-low {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.15); }
+            50% { box-shadow: 0 0 12px 2px rgba(239, 68, 68, 0.2); }
+        }
+        @keyframes kpi-pulse-high {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.15); }
+            50% { box-shadow: 0 0 12px 2px rgba(34, 197, 94, 0.25); }
+        }
+        @keyframes kpi-pulse-orange {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.15); }
+            50% { box-shadow: 0 0 12px 2px rgba(249, 115, 22, 0.25); }
+        }
+        @keyframes kpi-pulse-yellow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.15); }
+            50% { box-shadow: 0 0 12px 2px rgba(234, 179, 8, 0.25); }
+        }
+        .profile-kpi__value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--accent);
+            line-height: 1.2;
+        }
+        .profile-kpi__label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .profile-kpi__hint {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+            opacity: 0.85;
+        }
+        .profile-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 900px) {
+            .profile-charts { grid-template-columns: 1fr; }
+        }
+        .profile-chart-wrap {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            min-height: 280px;
+        }
+        .profile-chart-wrap--radar { min-height: 320px; }
+        .profile-chart-wrap__title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .profile-chart-wrap__sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        .profile-form-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 80px;
+            margin-top: 0.5rem;
+        }
+        .profile-form-bar {
+            flex: 1;
+            min-width: 24px;
+            border-radius: 4px 4px 0 0;
+            transition: transform 0.2s;
+        }
+        .profile-form-bar:hover { transform: scaleY(1.05); }
+        .profile-form-bar--win { background: var(--success); }
+        .profile-form-bar--loss { background: var(--danger); }
+        .profile-form-bar--empty { background: var(--bg-tertiary); }
+        .profile-form-bar:not(.profile-form-bar--empty) {
+            min-height: 24px;
+            height: 48px;
+        }
+        .profile-form-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        #chartRadar { max-height: 260px; }
+        #chartBar { max-height: 260px; }
+        .profile-hero {
+            background: linear-gradient(180deg, var(--bg-card) 0%, transparent 55%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem 2rem;
+            margin-bottom: 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 100%;
+            background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 55%);
+            pointer-events: none;
+        }
+        .profile-hero__inner {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+        .profile-hero__avatar-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+        .profile-hero__badge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--accent);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35rem 0.65rem;
+            border-radius: var(--radius-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .profile-hero__avatar {
+            width: 160px;
+            height: 160px;
+            border-radius: var(--radius-lg);
+            object-fit: cover;
+            border: 2px solid var(--border);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+            display: block;
+        }
+        .profile-hero__main {
+            flex: 1;
+            min-width: 220px;
+        }
+        .profile-hero__tag {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            letter-spacing: -0.02em;
+        }
+        .profile-hero__real-name {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .profile-hero__meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem 2rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .profile-hero__meta-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .profile-hero__meta-item img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .profile-hero__nation {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .profile-hero__nation-flag {
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+
+        .profile-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            padding: 0 1rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            position: relative;
+            z-index: 1;
+        }
+        .profile-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .profile-tab {
+            padding: 0.9rem 1.25rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .profile-tab:hover { color: var(--text-primary); }
+        .profile-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        .profile-tab-content { display: none; padding: 2rem 0; }
+        .profile-tab-content.active { display: block; }
+
+        .profile-two-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .profile-two-cols { grid-template-columns: 1fr; }
+        }
+        .profile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 1.75rem;
+            box-shadow: var(--shadow);
+        }
+        .profile-card__title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+        .profile-card__sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+        }
+        .stat-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .stat-row:last-child { margin-bottom: 0; }
+        .stat-row__label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            min-width: 100px;
+        }
+        .stat-row__bar-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .stat-row__bar {
+            height: 8px;
+            flex: 1;
+            max-width: 180px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .stat-row__bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #2563eb);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .stat-row__value {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 0.95rem;
+            min-width: 52px;
+            text-align: right;
+        }
+        .profile-card .btn {
+            width: 100%;
+            margin-top: 1.25rem;
+            justify-content: center;
+        }
+        .match-list { list-style: none; padding: 0; margin: 0; }
+        .match-list__item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.9rem 0;
+            border-bottom: 1px solid var(--border);
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.2s;
+        }
+        .match-list__item:last-child { border-bottom: none; }
+        .match-list__item:hover { background: var(--bg-tertiary); }
+        .match-list__bar {
+            width: 4px;
+            height: 100%;
+            min-height: 44px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        .match-list__bar--win { background: var(--success); }
+        .match-list__bar--loss { background: var(--danger); }
+        .match-list__content { flex: 1; min-width: 0; }
+        .match-list__vs {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .match-list__vs img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-right: 0.35rem;
+        }
+        .match-list__tournament {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+        .match-list__score {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+        .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+        .player-team-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+        .player-team-link:hover { color: var(--accent); }
+        .player-team-link img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header__container">
+            <a href="index.html" class="logo">
+                <span class="logo__icon">◈</span>
+                <span class="logo__text">Korvex</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html#matches" class="nav__link">Матчи</a>
+                <a href="rankings.html" class="nav__link">Рейтинг</a>
+                <a href="index.html#tournaments" class="nav__link">Турниры</a>
+                <a href="index.html#news" class="nav__link">Новости</a>
+                <a href="organizers.html" class="nav__link">Организаторы</a>
+            </nav>
+            <div class="header__actions">
+                <a href="register.html" class="btn btn--primary">Создать команду</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container player-profile-page">
+            <div id="playerProfile"></div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__brand">
+                    <span class="logo__icon">◈</span>
+                    <span>Korvex</span>
+                </div>
+                <div class="footer__links">
+                    <a href="#">О нас</a>
+                    <a href="#">Контакты</a>
+                    <a href="#">Правила</a>
+                    <a href="#">Партнёры</a>
+                </div>
+                <div class="footer__social">
+                    <a href="#">Twitter</a>
+                    <a href="#">Twitch</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+            <p class="footer__copy">© 2025 Korvex. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="api.js"></script>
+    <script>
+        const DEFAULT_AVATAR = 'img/avatar/avatar.png';
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const playerId = urlParams.get('id');
+
+        function norm(val, max) {
+            if (max <= 0) return 0;
+            return Math.min(100, Math.round((Number(val) / max) * 100));
+        }
+
+        async function loadPlayerProfile() {
+            const container = document.getElementById('playerProfile');
+            if (!playerId) {
+                container.innerHTML = '<div class="empty-state"><h2>Укажите игрока</h2><p>Перейдите из раздела <a href="rankings.html">Рейтинг → Игроки</a></p></div>';
+                return;
+            }
+
+            try {
+                const [players, teams, matchesList] = await Promise.all([
+                    typeof rankingPlayersAPI !== 'undefined' ? rankingPlayersAPI.getAll() : [],
+                    typeof rankingTeamsAPI !== 'undefined' ? rankingTeamsAPI.getAll() : [],
+                    typeof matchesAPI !== 'undefined' ? matchesAPI.getAll() : []
+                ]);
+                const playerList = Array.isArray(players) ? players : [];
+                const teamList = Array.isArray(teams) ? teams : [];
+                const matches = Array.isArray(matchesList) ? matchesList : (matchesList && matchesList.matches ? matchesList.matches : []);
+                const player = playerList.find(p => p.id === parseInt(playerId, 10));
+
+                if (!player) {
+                    container.innerHTML = '<div class="empty-state"><h2>Игрок не найден</h2><p><a href="rankings.html">Вернуться к рейтингу</a></p></div>';
+                    document.title = 'Игрок не найден — Korvex';
+                    return;
+                }
+
+                const team = player.team_id ? teamList.find(t => t.id === player.team_id) : null;
+                const teamName = team ? (team.team_name || team.teamName || '') : '';
+                const teamMatches = teamName ? matches.filter(m => (m.team1_name === teamName || m.team2_name === teamName) && (m.status === 'finished' || (m.status || '').toLowerCase() === 'завершён')) : [];
+                const recentMatches = teamMatches.slice(0, 10);
+                const winsCount = recentMatches.filter(m => {
+                    const isTeam1 = m.team1_name === teamName;
+                    const our = isTeam1 ? m.score1 : m.score2;
+                    const opp = isTeam1 ? m.score2 : m.score1;
+                    return our != null && opp != null && our > opp;
+                }).length;
+                const winRatePercent = recentMatches.length ? Math.round((winsCount / recentMatches.length) * 100) : null;
+                const winRateStr = recentMatches.length ? winRatePercent + '%' : '—';
+
+                const tag = player.nickname || player.player_name || player.playerName || 'Игрок';
+                const realName = player.player_name || player.playerName || (player.nickname ? '' : 'Игрок');
+                const avatarSrc = !player.avatar || player.avatar.includes('api.dicebear.com') ? DEFAULT_AVATAR : player.avatar;
+                const rating = Number(player.rating) || 0;
+                const kills = Number(player.kills) || 0;
+                const deaths = Number(player.deaths) || 0;
+                const assists = Number(player.assists) || 0;
+                const kd = deaths > 0 ? (kills / deaths) : (kills > 0 ? kills : 0);
+                const kdStr = kd.toFixed(2);
+                const rNorm = Math.min(100, Math.round(rating * 33));
+                const kdNorm = Math.min(100, Math.round(kd * 25));
+                const matchesPlayed = Number(player.matches_played) || recentMatches.length || 0;
+                const avgKills = matchesPlayed > 0 ? (Number(player.avg_kills) || (kills / matchesPlayed)) : 0;
+                const avgEntry = matchesPlayed > 0 ? (Number(player.avg_entry_kills) || 0) : 0;
+                const avgTrade = matchesPlayed > 0 ? (Number(player.avg_trade_kills) || 0) : 0;
+
+                function flagFromCode(code) {
+                    if (!code || typeof code !== 'string' || code.length !== 2) return '';
+                    return String.fromCodePoint(...[...code.toUpperCase()].map(c => 0x1F1E6 - 65 + c.charCodeAt(0)));
+                }
+                const countryNames = { RU: 'Россия', BY: 'Беларусь', UA: 'Украина', KZ: 'Казахстан', PL: 'Польша', DE: 'Германия', FR: 'Франция', BR: 'Бразилия', US: 'США', GB: 'Великобритания', CN: 'Китай', KR: 'Южная Корея', SE: 'Швеция', DK: 'Дания', NO: 'Норвегия', FI: 'Финляндия', EE: 'Эстония', LV: 'Латвия', LT: 'Литва', CIS: 'СНГ' };
+                const countryCode = (player.country_code || player.countryCode || '').trim().toUpperCase();
+                const countryName = countryCode ? (countryNames[countryCode] || countryCode) : '—';
+                const flagEmoji = flagFromCode(countryCode);
+                const metaTeam = team ? `<span class="profile-hero__meta-item">
+                    <a href="team-profile.html?id=${team.id}" class="player-team-link">
+                        <img src="${escapeHtml(team.logo || DEFAULT_AVATAR)}" alt="" onerror="this.src='${DEFAULT_AVATAR}'">
+                        ${escapeHtml(team.team_name || team.teamName || 'Команда')}
+                    </a>
+                </span>` : '';
+                const metaNation = `<span class="profile-hero__meta-item profile-hero__nation">
+                    <span class="profile-hero__nation-flag" aria-hidden="true">${flagEmoji || '🌐'}</span>
+                    <span>${escapeHtml(countryName)}</span>
+                </span>`;
+
+                document.title = `${escapeHtml(tag)} — Профиль игрока | Korvex`;
+
+                const formBarsHtml = recentMatches.length
+                    ? recentMatches.map(m => {
+                        const isTeam1 = m.team1_name === teamName;
+                        const our = isTeam1 ? m.score1 : m.score2;
+                        const opp = isTeam1 ? m.score2 : m.score1;
+                        const won = our != null && opp != null && our > opp;
+                        return `<div class="profile-form-bar ${won ? 'profile-form-bar--win' : 'profile-form-bar--loss'}" title="${won ? 'Победа' : 'Поражение'}"></div>`;
+                    }).join('')
+                    : '<div class="profile-form-bar profile-form-bar--empty" style="width:100%"></div>';
+
+                const matchesHtml = recentMatches.length
+                    ? recentMatches.map(m => {
+                        const isTeam1 = m.team1_name === teamName;
+                        const ourScore = isTeam1 ? m.score1 : m.score2;
+                        const oppScore = isTeam1 ? m.score2 : m.score1;
+                        const oppName = isTeam1 ? (m.team2_name || '—') : (m.team1_name || '—');
+                        const oppLogo = isTeam1 ? (m.team2_logo || DEFAULT_AVATAR) : (m.team1_logo || DEFAULT_AVATAR);
+                        const won = (ourScore != null && oppScore != null) ? ourScore > oppScore : false;
+                        const scoreStr = [ourScore, oppScore].every(n => n != null) ? `${ourScore}:${oppScore}` : '—';
+                        const matchLink = m.id != null ? `match-stats.html?id=${encodeURIComponent(m.id)}` : null;
+                        const itemStart = matchLink ? `<a class="match-list__item" href="${matchLink}">` : `<li class="match-list__item">`;
+                        const itemEnd = matchLink ? `</a>` : `</li>`;
+                        return `${itemStart}
+                            <span class="match-list__bar ${won ? 'match-list__bar--win' : 'match-list__bar--loss'}"></span>
+                            <div class="match-list__content">
+                                <div class="match-list__vs">vs <img src="${escapeHtml(oppLogo)}" alt="" onerror="this.src='${DEFAULT_AVATAR}'"> ${escapeHtml(oppName)}</div>
+                                <div class="match-list__tournament">${escapeHtml(m.tournament_name || '—')}</div>
+                            </div>
+                            <span class="match-list__score">${escapeHtml(scoreStr)}</span>
+                        ${itemEnd}`;
+                    }).join('')
+                    : '<li class="match-list__item"><div class="match-list__content"><span class="match-list__vs">Нет завершённых матчей</span></div></li>';
+
+                container.innerHTML = `
+                    <div class="profile-hero">
+                        <div class="profile-hero__inner">
+                            <div class="profile-hero__avatar-wrap">
+                                <span class="profile-hero__badge">Игрок</span>
+                                <img src="${escapeHtml(avatarSrc)}" alt="${escapeHtml(tag)}" class="profile-hero__avatar" onerror="this.src='${DEFAULT_AVATAR}'">
+                            </div>
+                            <div class="profile-hero__main">
+                                <h1 class="profile-hero__tag">${escapeHtml(tag)}</h1>
+                                ${realName ? `<p class="profile-hero__real-name">${escapeHtml(realName)}</p>` : ''}
+                                <div class="profile-hero__meta">
+                                    ${metaNation}
+                                    ${metaTeam}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile-tabs">
+                            <button type="button" class="profile-tab active" data-tab="info">Инфо</button>
+                            <button type="button" class="profile-tab" data-tab="matches">Матчи</button>
+                        </div>
+                    </div>
+                    <div class="profile-tab-content active" id="tab-info">
+                        <div class="profile-kpi">
+                            <div class="profile-kpi__item ${rating >= 1.30 ? 'profile-kpi__item--high' : rating >= 1.10 && rating <= 1.29 ? 'profile-kpi__item--yellow' : rating <= 1.09 ? 'profile-kpi__item--low' : ''}">
+                                <div class="profile-kpi__value">${rating.toFixed(2)}</div>
+                                <div class="profile-kpi__label">Рейтинг</div>
+                                <div class="profile-kpi__hint">среднее за все матчи</div>
+                            </div>
+                            <div class="profile-kpi__item ${kd > 1.25 ? 'profile-kpi__item--high' : kd >= 1 && kd <= 1.24 ? 'profile-kpi__item--yellow' : kd < 1 ? 'profile-kpi__item--low' : ''}">
+                                <div class="profile-kpi__value">${kdStr}</div>
+                                <div class="profile-kpi__label">K/D</div>
+                                <div class="profile-kpi__hint">среднее за все матчи</div>
+                            </div>
+                            <div class="profile-kpi__item">
+                                <div class="profile-kpi__value">${recentMatches.length}</div>
+                                <div class="profile-kpi__label">Матчей</div>
+                            </div>
+                            <div class="profile-kpi__item">
+                                <div class="profile-kpi__value">${winsCount}</div>
+                                <div class="profile-kpi__label">Побед</div>
+                            </div>
+                            <div class="profile-kpi__item ${winRatePercent != null ? (winRatePercent > 70 ? 'profile-kpi__item--high' : winRatePercent >= 40 ? 'profile-kpi__item--yellow' : 'profile-kpi__item--low') : ''}">
+                                <div class="profile-kpi__value">${winRateStr}</div>
+                                <div class="profile-kpi__label">% побед</div>
+                            </div>
+                        </div>
+                        <div class="profile-charts">
+                            <div class="profile-chart-wrap profile-chart-wrap--radar">
+                                <div class="profile-chart-wrap__title">Профиль показателей</div>
+                                <div class="profile-chart-wrap__sub">Сравнение по осям (нормализовано)</div>
+                                <canvas id="chartRadar" height="260"></canvas>
+                            </div>
+                            <div class="profile-chart-wrap">
+                                <div class="profile-chart-wrap__title">Статистика по категориям</div>
+                                <div class="profile-chart-wrap__sub">Рейтинг</div>
+                                <canvas id="chartBar" height="260"></canvas>
+                            </div>
+                        </div>
+                        <div class="profile-two-cols">
+                            <div class="profile-card">
+                                <h2 class="profile-card__title">Форма (последние матчи)</h2>
+                                <p class="profile-card__sub">Победы и поражения команды</p>
+                                <div class="profile-form-chart" id="formChart">${formBarsHtml}</div>
+                                <div class="profile-form-labels">
+                                    <span>Старые</span>
+                                    <span>Новые</span>
+                                </div>
+                            </div>
+                            <div class="profile-card">
+                                <h2 class="profile-card__title">Статистика ${escapeHtml(tag)}</h2>
+                                <p class="profile-card__sub">Рейтинг и основные показатели</p>
+                                <div class="stat-row">
+                                    <span class="stat-row__label">Рейтинг</span>
+                                    <div class="stat-row__bar-wrap">
+                                        <div class="stat-row__bar"><div class="stat-row__bar-fill" style="width:${rNorm}%"></div></div>
+                                        <span class="stat-row__value">${rating.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-row__label">K/D</span>
+                                    <div class="stat-row__bar-wrap">
+                                        <div class="stat-row__bar"><div class="stat-row__bar-fill" style="width:${kdNorm}%"></div></div>
+                                        <span class="stat-row__value">${kdStr}</span>
+                                    </div>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-row__label">AVG Kills</span>
+                                    <div class="stat-row__bar-wrap">
+                                        <div class="stat-row__bar"><div class="stat-row__bar-fill" style="width:${Math.min(100, Math.round((avgKills / 30) * 100))}%"></div></div>
+                                        <span class="stat-row__value">${avgKills.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                                <a href="rankings.html" class="btn btn--primary">Полная статистика в рейтинге</a>
+                            </div>
+                        </div>
+                        <div class="profile-card" style="margin-top: 2rem;">
+                            <h2 class="profile-card__title">Предстоящие и последние матчи</h2>
+                            <p class="profile-card__sub">Матчи команды</p>
+                            <ul class="match-list">${matchesHtml}</ul>
+                        </div>
+                    </div>
+                    <div class="profile-tab-content" id="tab-matches">
+                        <div class="profile-card">
+                            <h2 class="profile-card__title">Матчи</h2>
+                            <p class="profile-card__sub">Матчи команды с участием игрока</p>
+                            <ul class="match-list">${matchesHtml}</ul>
+                        </div>
+                    </div>
+                `;
+
+                container.querySelectorAll('.profile-tab').forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        const t = this.dataset.tab;
+                        container.querySelectorAll('.profile-tab').forEach(x => x.classList.remove('active'));
+                        container.querySelectorAll('.profile-tab-content').forEach(x => x.classList.remove('active'));
+                        this.classList.add('active');
+                        const panel = document.getElementById('tab-' + t);
+                        if (panel) panel.classList.add('active');
+                    });
+                });
+
+                if (typeof Chart !== 'undefined') {
+                    const gridColor = 'rgba(148, 163, 184, 0.12)';
+                    const textColor = '#94a3b8';
+                    const accentColor = 'rgba(59, 130, 246, 0.9)';
+                    const radarLabels = ['Рейтинг', 'K/D'];
+                    const radarValues = [rNorm, kdNorm];
+                    const barLabels = ['Рейтинг ×20'];
+                    const barValues = [Math.round(rating * 20)];
+
+                    const radarCtx = document.getElementById('chartRadar');
+                    if (radarCtx) {
+                        new Chart(radarCtx, {
+                            type: 'radar',
+                            data: {
+                                labels: radarLabels,
+                                datasets: [{
+                                    label: tag,
+                                    data: radarValues,
+                                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                                    borderColor: 'rgb(59, 130, 246)',
+                                    borderWidth: 2,
+                                    pointBackgroundColor: 'rgb(59, 130, 246)',
+                                    pointBorderColor: '#fff',
+                                    pointHoverBackgroundColor: '#fff',
+                                    pointHoverBorderColor: 'rgb(59, 130, 246)'
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    r: {
+                                        min: 0,
+                                        max: 100,
+                                        ticks: { display: false },
+                                        grid: { color: gridColor },
+                                        pointLabels: { color: textColor, font: { size: 11 } }
+                                    }
+                                },
+                                plugins: {
+                                    legend: { display: false }
+                                }
+                            }
+                        });
+                    }
+                    const barCtx = document.getElementById('chartBar');
+                    if (barCtx) {
+                        new Chart(barCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: barLabels,
+                                datasets: [{
+                                    label: 'Значение',
+                                    data: barValues,
+                                    backgroundColor: [
+                                        'rgba(59, 130, 246, 0.7)',
+                                        'rgba(239, 68, 68, 0.6)',
+                                        'rgba(34, 197, 94, 0.6)',
+                                        'rgba(168, 85, 247, 0.6)'
+                                    ],
+                                    borderColor: ['#3b82f6', '#ef4444', '#22c55e', '#a855f7'],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                indexAxis: 'y',
+                                scales: {
+                                    x: {
+                                        grid: { color: gridColor },
+                                        ticks: { color: textColor }
+                                    },
+                                    y: {
+                                        grid: { display: false },
+                                        ticks: { color: textColor }
+                                    }
+                                },
+                                plugins: {
+                                    legend: { display: false }
+                                }
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки профиля игрока:', error);
+                container.innerHTML = '<div class="empty-state"><h2>Ошибка загрузки данных</h2><p>Убедитесь, что сервер запущен.</p><a href="rankings.html">Рейтинг</a></div>';
+                document.title = 'Ошибка — Korvex';
+            }
+        }
+
+        loadPlayerProfile();
+    </script>
+</body>
+</html>

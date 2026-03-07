@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рейтинг — Korvex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header__container">
+            <a href="index.html" class="logo">
+                <span class="logo__icon">◈</span>
+                <span class="logo__text">Korvex</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html#matches" class="nav__link">Матчи</a>
+                <a href="rankings.html" class="nav__link active">Рейтинг</a>
+                <a href="index.html#tournaments" class="nav__link">Турниры</a>
+                <a href="index.html#news" class="nav__link">Новости</a>
+                <a href="organizers.html" class="nav__link">Организаторы</a>
+            </nav>
+            <div class="header__actions">
+                <a href="register.html" class="btn btn--primary">Создать команду</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Боковые баннеры -->
+    <aside class="banner banner--left" id="banner-left"></aside>
+    <aside class="banner banner--right" id="banner-right"></aside>
+
+    <main class="main">
+        <section id="rankings" class="section section--dark">
+            <div class="container">
+                <div class="section__header">
+                    <h2 class="section__title">Рейтинг</h2>
+                    <span class="section__subtitle">Обновлено 2 часа назад</span>
+                </div>
+                
+                <!-- Вкладки рейтинга -->
+                <div class="rankings-tabs">
+                    <button class="rankings-tab active" data-tab="teams">Команды</button>
+                    <button class="rankings-tab" data-tab="players">Игроки</button>
+                </div>
+                
+                <!-- Контент для команд -->
+                <div class="rankings-content active" id="rankings-teams">
+                    <div class="rankings-table" id="teamsTable"></div>
+                    <div class="rankings-pagination" id="teamsPagination"></div>
+                </div>
+                
+                <!-- Контент для игроков -->
+                <div class="rankings-content" id="rankings-players">
+                    <div class="players-grid" id="playersGrid"></div>
+                    <div class="rankings-pagination" id="playersPagination"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__brand">
+                    <span class="logo__icon">◈</span>
+                    <span>Korvex</span>
+                </div>
+                <div class="footer__links">
+                    <a href="#">О нас</a>
+                    <a href="#">Контакты</a>
+                    <a href="#">Правила</a>
+                    <a href="#">Партнёры</a>
+                </div>
+                <div class="footer__social">
+                    <a href="#">Twitter</a>
+                    <a href="#">Twitch</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+            <p class="footer__copy">© 2025 Korvex. Все права защищены.</p>
+            <a href="admin-login.html" style="position: fixed; bottom: 0; right: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none;">Admin</a>
+        </div>
+    </footer>
+
+    <script src="api.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Пагинация рейтинга команд
+        let allTeams = [];
+        const TEAMS_PER_PAGE = 10;
+        let currentTeamsPage = 1;
+
+        // Пагинация рейтинга игроков
+        let allPlayers = [];
+        const PLAYERS_PER_PAGE = 55;
+        let currentPlayersPage = 1;
+
+        async function loadRankingsData() {
+            try {
+                // Загрузка команд
+                const teams = await rankingTeamsAPI.getAll();
+                const teamsContainer = document.getElementById('teamsTable');
+                const paginationContainer = document.getElementById('teamsPagination');
+                allTeams = Array.isArray(teams) ? teams : [];
+
+                if (allTeams.length === 0) {
+                    teamsContainer.innerHTML = '<div class="empty-state">Нет команд в рейтинге</div>';
+                    if (paginationContainer) paginationContainer.innerHTML = '';
+                } else {
+                    const totalPages = Math.max(1, Math.ceil(allTeams.length / TEAMS_PER_PAGE));
+
+                    function renderTeamsPage(page) {
+                        if (!teamsContainer) return;
+                        currentTeamsPage = Math.min(Math.max(page, 1), totalPages);
+                        const startIndex = (currentTeamsPage - 1) * TEAMS_PER_PAGE;
+                        const pageTeams = allTeams.slice(startIndex, startIndex + TEAMS_PER_PAGE);
+
+                        teamsContainer.innerHTML = `
+                            <div class="rankings-table__header rankings-table__header--compact">
+                                <span>Место</span>
+                                <span>Команда</span>
+                                <span>Очки</span>
+                            </div>
+                            ${pageTeams.map((team, indexOnPage) => {
+                                const index = startIndex + indexOnPage;
+                                const top5 = index < 5;
+                                const rankClass = top5 ? `rankings-table__row--top5 rankings-table__row--rank-${index + 1}` : '';
+                                const points = Math.round(Number(team.rating) || team.points || 0);
+                                return `
+                                <div class="rankings-table__row rankings-table__row--compact ${rankClass}" style="cursor: pointer;" onclick="window.location.href='team-profile.html?id=${team.id}'">
+                                    <span class="rank">${index + 1}</span>
+                                    <div class="team-cell">
+                                        <img src="${team.logo || 'img/avatar/avatar.png'}" alt="${team.team_name}">
+                                        <span>${team.team_name}</span>
+                                    </div>
+                                    <span>${points}</span>
+                                </div>
+                            `;
+                            }).join('')}
+                        `;
+                    }
+
+                    function renderTeamsPagination() {
+                        if (!paginationContainer) return;
+                        if (totalPages <= 1) {
+                            paginationContainer.innerHTML = '';
+                            return;
+                        }
+
+                        let html = '';
+                        const prevDisabled = currentTeamsPage === 1 ? 'disabled' : '';
+                        const nextDisabled = currentTeamsPage === totalPages ? 'disabled' : '';
+
+                        html += `<button class="rankings-pagination__btn" data-page="${currentTeamsPage - 1}" ${prevDisabled}>Назад</button>`;
+
+                        for (let i = 1; i <= totalPages; i++) {
+                            const activeClass = i === currentTeamsPage ? 'rankings-pagination__btn--active' : '';
+                            html += `<button class="rankings-pagination__btn ${activeClass}" data-page="${i}">${i}</button>`;
+                        }
+
+                        html += `<button class="rankings-pagination__btn" data-page="${currentTeamsPage + 1}" ${nextDisabled}>Вперёд</button>`;
+
+                        paginationContainer.innerHTML = html;
+
+                        paginationContainer.querySelectorAll('button[data-page]').forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                const page = Number(btn.getAttribute('data-page'));
+                                if (!Number.isFinite(page)) return;
+                                if (page < 1 || page > totalPages) return;
+                                renderTeamsPage(page);
+                                renderTeamsPagination();
+                                const rankingsSection = document.getElementById('rankings');
+                                if (rankingsSection) {
+                                    rankingsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }
+                            });
+                        });
+                    }
+
+                    renderTeamsPage(currentTeamsPage);
+                    renderTeamsPagination();
+                }
+
+                // Загрузка игроков
+                const players = await rankingPlayersAPI.getAll();
+                const playersContainer = document.getElementById('playersGrid');
+                const playersPagination = document.getElementById('playersPagination');
+
+                // Сортировка игроков по рейтингу (от большего к меньшему)
+                allPlayers = [...players].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+
+                if (!playersContainer) return;
+
+                if (allPlayers.length === 0) {
+                    playersContainer.innerHTML = '<div class="empty-state">Нет игроков в рейтинге</div>';
+                    if (playersPagination) playersPagination.innerHTML = '';
+                } else {
+                    const teamNameById = {};
+                    allTeams.forEach(t => { teamNameById[t.id] = t.team_name || t.teamName || ''; });
+
+                    const totalPlayerPages = Math.max(1, Math.ceil(allPlayers.length / PLAYERS_PER_PAGE));
+
+                    function renderPlayersPage(page) {
+                        if (!playersContainer) return;
+                        currentPlayersPage = Math.min(Math.max(page, 1), totalPlayerPages);
+                        const startIndex = (currentPlayersPage - 1) * PLAYERS_PER_PAGE;
+                        const pagePlayers = allPlayers.slice(startIndex, startIndex + PLAYERS_PER_PAGE);
+
+                        playersContainer.innerHTML = pagePlayers.map((player, indexOnPage) => {
+                            const index = startIndex + indexOnPage;
+                            const avatarSrc = !player.avatar || player.avatar.includes('api.dicebear.com/7.x/avataaars')
+                                ? 'img/avatar/avatar.png'
+                                : player.avatar;
+                            const teamName = player.team_id != null ? (teamNameById[player.team_id] || '') : '';
+                            const top5 = index < 5;
+                            const rankClass = top5 ? `player-card--top5 player-card--rank-${index + 1}` : '';
+                            return `
+                            <article class="player-card ${rankClass}" style="cursor: pointer;" onclick="window.location.href='player-profile.html?id=${player.id}'">
+                                <div class="player-card__rank">${index + 1}</div>
+                                <img src="${avatarSrc}" alt="${player.player_name || player.nickname}" class="player-card__avatar">
+                                <div class="player-card__info">
+                                    <h4>${player.nickname || player.player_name || 'Игрок'}</h4>
+                                    <span>${teamName || '—'}</span>
+                                    <div class="player-card__stats">
+                                        <span>${(player.rating || 0).toFixed(2)}</span>
+                                        <span>Rating</span>
+                                    </div>
+                                </div>
+                            </article>
+                        `;
+                        }).join('');
+                    }
+
+                    function renderPlayersPagination() {
+                        if (!playersPagination) return;
+                        if (totalPlayerPages <= 1) {
+                            playersPagination.innerHTML = '';
+                            return;
+                        }
+
+                        let html = '';
+                        const prevDisabled = currentPlayersPage === 1 ? 'disabled' : '';
+                        const nextDisabled = currentPlayersPage === totalPlayerPages ? 'disabled' : '';
+
+                        html += `<button class="rankings-pagination__btn" data-page="${currentPlayersPage - 1}" ${prevDisabled}>Назад</button>`;
+
+                        for (let i = 1; i <= totalPlayerPages; i++) {
+                            const activeClass = i === currentPlayersPage ? 'rankings-pagination__btn--active' : '';
+                            html += `<button class="rankings-pagination__btn ${activeClass}" data-page="${i}">${i}</button>`;
+                        }
+
+                        html += `<button class="rankings-pagination__btn" data-page="${currentPlayersPage + 1}" ${nextDisabled}>Вперёд</button>`;
+
+                        playersPagination.innerHTML = html;
+
+                        playersPagination.querySelectorAll('button[data-page]').forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                const page = Number(btn.getAttribute('data-page'));
+                                if (!Number.isFinite(page)) return;
+                                if (page < 1 || page > totalPlayerPages) return;
+                                renderPlayersPage(page);
+                                renderPlayersPagination();
+                                const rankingsSection = document.getElementById('rankings');
+                                if (rankingsSection) {
+                                    rankingsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }
+                            });
+                        });
+                    }
+
+                    renderPlayersPage(currentPlayersPage);
+                    renderPlayersPagination();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки рейтинга:', error);
+                document.getElementById('teamsTable').innerHTML = '<div class="empty-state">Ошибка загрузки данных. Убедитесь, что сервер запущен.</div>';
+                document.getElementById('playersGrid').innerHTML = '<div class="empty-state">Ошибка загрузки данных. Убедитесь, что сервер запущен.</div>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRankingsData();
+        });
+    </script>
+</body>
+</html>
+

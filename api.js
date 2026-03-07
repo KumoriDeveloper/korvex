@@ -1,5 +1,5 @@
 // API функции для работы с сервером
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'http://95.81.122.36:3000/api';
 
 // Общая функция для запросов
 async function apiRequest(endpoint, options = {}) {

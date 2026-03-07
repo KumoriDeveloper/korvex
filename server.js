@@ -63,7 +63,7 @@ app.get('/api/image-proxy', (req, res) => {
     }
 
     const host = (parsed.hostname || '').toLowerCase();
-    const blockedHosts = new Set(['localhost', '127.0.0.1', '::1']);
+    const blockedHosts = new Set(['95.81.122.36', '::1']);
     if (blockedHosts.has(host)) {
         return res.status(403).send('Forbidden');
     }
@@ -1676,7 +1676,7 @@ initDatabase()
     .then(() => {
         console.log('База данных инициализирована');
         app.listen(PORT, () => {
-            console.log(`Сервер запущен на http://localhost:${PORT}`);
+            console.log(`Сервер запущен на http://95.81.122.36:${PORT}`);
         });
     })
     .catch(err => {

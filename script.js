@@ -208,7 +208,7 @@ async function loadNews() {
                     </div>
                     <div class="news-card__content">
                         <h3>Нет новостей</h3>
-                        <p>Добавьте новости через админ-панель</p>
+                        <p>Добавьте новости  </p>
                         <div class="news-card__meta">—</div>
                     </div>
                 </article>
@@ -337,7 +337,7 @@ async function loadMatches() {
         const list = await matchesAPI.getAll();
         const matches = Array.isArray(list) ? list : (list.matches || list.data || []);
         if (matches.length === 0) {
-            grid.innerHTML = '<p style="color: var(--text-muted); padding: 2rem;">Матчей пока нет. Добавьте их в админ-панели.</p>';
+            grid.innerHTML = '<p style="color: var(--text-muted); padding: 2rem;">Матчей пока нет.  </p>';
             return;
         }
         grid.innerHTML = matches.map(m => {
@@ -412,7 +412,7 @@ async function loadTournaments() {
         const list = await tournamentsAPI.getAll();
         const tournaments = Array.isArray(list) ? list : (list.tournaments || list.data || []);
         if (tournaments.length === 0) {
-            grid.innerHTML = '<p style="color: var(--text-muted); padding: 2rem;">Турниров пока нет. Добавьте их в админ-панели.</p>';
+            grid.innerHTML = '<p style="color: var(--text-muted); padding: 2rem;">Турниров пока нет.  </p>';
             return;
         }
         // Кэш турниров для страницы турнира (чтобы переход с главной всегда открывал страницу)

@@ -373,10 +373,10 @@ function initDatabase() {
                 if (err) {
                     reject(err);
                 } else if (row.count === 0) {
-                    db.run("INSERT INTO admins (username, password) VALUES ('admin', 'admin')", (err) => {
+                    db.run("INSERT INTO admins (username, password) VALUES ('korvexadmin', 'gkjldfguhrgunfj23243256!!@@!$#')", (err) => {
                         if (err) reject(err);
                         else {
-                            console.log('Создан администратор по умолчанию: admin/admin');
+                            // console.log('Создан администратор по умолчанию: admin/admin');
                             resolve();
                         }
                     });

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты — Korvex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/korvex/favicon.ico" type="image/x-icon">
+    <style>
+        .contacts-page {
+            padding: 3rem 0 4rem;
+        }
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr);
+            gap: 2rem;
+        }
+        .contacts-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            padding: 1.5rem 1.75rem;
+            box-shadow: var(--shadow);
+        }
+        .contacts-card h3 {
+            font-size: 1.05rem;
+            margin-bottom: 0.75rem;
+        }
+        .contacts-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .contacts-list li {
+            padding: 0.55rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.93rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .contacts-list li:last-child {
+            border-bottom: none;
+        }
+        .contacts-label {
+            color: var(--text-muted);
+        }
+        .contacts-value a {
+            color: var(--accent);
+            font-weight: 500;
+        }
+        .contacts-value a:hover {
+            color: var(--accent-hover);
+        }
+        .contacts-note {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.75rem;
+        }
+        @media (max-width: 900px) {
+            .contacts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header__container">
+            <a href="index.html" class="logo">
+                <span class="logo__icon">◈</span>
+                <span class="logo__text">Korvex</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html#matches" class="nav__link">Матчи</a>
+                <a href="rankings.html" class="nav__link">Рейтинг</a>
+                <a href="index.html#tournaments" class="nav__link">Турниры</a>
+                <a href="organizers.html" class="nav__link">Организаторы</a>
+            </nav>
+            <div class="header__actions">
+                <a href="register.html" class="btn btn--primary">Создать команду</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="section">
+            <div class="container contacts-page">
+                <div class="static-page-header">
+                    <h1 class="static-page-title">Контакты</h1>
+                    <p class="static-page-subtitle">
+                        Свяжитесь с нами по вопросам турниров, партнёрств и технической поддержки платформы.
+                    </p>
+                </div>
+
+                <div class="contacts-grid">
+                    <div class="contacts-card">
+                        <h3>Основные контакты</h3>
+                        <ul class="contacts-list">
+                            
+                            <li>
+                                <span class="contacts-label">Telegram для связи</span>
+                                <span class="contacts-value"><a href="https://t.me/kolfeevManager" target="_blank">kolfeevManager</a></span>
+                            </li>
+                            <li>
+                                <span class="contacts-label">Вопросы по турнирам</span>
+                                <span class="contacts-value"><a href="https://t.me/s7venfnNN">s7venfnNN</a></span>
+                            </li>
+                        </ul>
+                        <p class="contacts-note">
+                            Конкретные контакты организаторов указаны на страницах турниров и профилях организаторов.
+                        </p>
+                    </div>
+
+                    <div class="contacts-card">
+                        <h3>Обратная связь</h3>
+                        <p class="contacts-note">
+                            Если вы нашли ошибку, хотите предложить новый функционал или улучшения для рейтинга и
+                            отображения статистики — напишите нам. Мы внимательно относимся к запросам игроков,
+                            капитанов и организаторов.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__brand">
+                    <span class="logo__icon">◈</span>
+                    <span>Korvex</span>
+                </div>
+                <div class="footer__links">
+                    <a href="about.html">О нас</a>
+                    <a href="contacts.html">Контакты</a>
+                    <a href="rules.html">Правила</a>
+                </div>
+                <div class="footer__social">
+                    <a href="https://t.me/korvexhub">Telegram</a>
+                    <a href="#">Twitch</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+            <p class="footer__copy">© 2026 Korvex. Все права защищены.</p>
+        </div>
+    </footer>
+</body>
+</html>
+

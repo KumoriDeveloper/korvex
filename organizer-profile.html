@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль организатора — Korvex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/korvex/favicon.ico" type="image/x-icon">
+    <style>
+        .organizer-profile-page {
+            padding: 2rem 0 3rem;
+        }
+        .organizer-profile-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .organizer-profile-logo {
+            width: 96px;
+            height: 96px;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            object-fit: contain;
+        }
+        .organizer-profile-main {
+            flex: 1;
+            min-width: 220px;
+        }
+        .organizer-profile-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+        .organizer-profile-tagline {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 0.85rem;
+        }
+        .organizer-profile-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .organizer-profile-meta span {
+            padding: 0.25rem 0.7rem;
+            border-radius: 999px;
+            background: var(--bg-tertiary);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .organizer-profile-social {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .organizer-profile-social a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .organizer-profile-social a:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .organizer-profile-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
+            gap: 1.75rem;
+        }
+        @media (max-width: 900px) {
+            .organizer-profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .organizer-profile-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            padding: 1.5rem 1.75rem;
+            box-shadow: var(--shadow);
+        }
+        .organizer-profile-card + .organizer-profile-card {
+            margin-top: 1.25rem;
+        }
+        .organizer-profile-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.85rem;
+        }
+        .organizer-profile-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .organizer-profile-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .organizer-profile-stat-pill {
+            padding: 0.55rem 0.9rem;
+            border-radius: 999px;
+            background: var(--bg-tertiary);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .organizer-profile-stat-pill strong {
+            font-family: var(--font-mono);
+            color: var(--accent);
+            margin-right: 0.25rem;
+        }
+        .organizer-profile-tournaments-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .organizer-profile-tournaments-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .organizer-profile-tournaments-list li:last-child {
+            border-bottom: none;
+        }
+        .organizer-profile-tournament-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .organizer-profile-tournament-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .organizer-profile-matches-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .organizer-profile-matches-list li {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .organizer-profile-matches-list li:last-child {
+            border-bottom: none;
+        }
+        .organizer-profile-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .organizer-profile-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .organizer-profile-back:hover {
+            color: var(--text-primary);
+        }
+        .organizer-profile-empty {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header__container">
+            <a href="index.html" class="logo">
+                <span class="logo__icon">◈</span>
+                <span class="logo__text">Korvex</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html#matches" class="nav__link">Матчи</a>
+                <a href="rankings.html" class="nav__link">Рейтинг</a>
+                <a href="index.html#tournaments" class="nav__link">Турниры</a>
+                  
+                <a href="organizers.html" class="nav__link active">Организаторы</a>
+            </nav>
+            <div class="header__actions">
+                <a href="register.html" class="btn btn--primary">Создать команду</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="section">
+            <div class="container organizer-profile-page">
+                <a href="organizers.html" class="organizer-profile-back">← Назад к организаторам</a>
+                <div id="organizerProfileRoot">
+                    <p class="organizer-profile-empty">Загрузка профиля организатора...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__brand">
+                    <span class="logo__icon">◈</span>
+                    <span>Korvex</span>
+                </div>
+                <div class="footer__links">
+                    <a href="#">О нас</a>
+                    <a href="#">Контакты</a>
+                    <a href="#">Правила</a>
+                </div>
+                <div class="footer__social">
+                    <a href="https://t.me/korvexhub">Telegram</a>
+                    <a href="#">Twitch</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+            <p class="footer__copy">© 2026 Korvex. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="api.js"></script>
+    <script>
+        const DEFAULT_LOGO = 'img/avatar/avatar.png';
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function parseSocialLinks(social_links) {
+            if (!social_links) return {};
+            try {
+                return typeof social_links === 'string' ? JSON.parse(social_links) : social_links;
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function getOrganizerIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            return id;
+        }
+
+        async function loadOrganizerProfile() {
+            const root = document.getElementById('organizerProfileRoot');
+            if (!root) return;
+
+            const id = getOrganizerIdFromUrl();
+            if (!id) {
+                root.innerHTML = '<p class="organizer-profile-empty">Не указан ID организатора.</p>';
+                return;
+            }
+
+            try {
+                const [org, tournaments, matches] = await Promise.all([
+                    typeof organizersAPI !== 'undefined' ? organizersAPI.getOne(id) : null,
+                    typeof tournamentsAPI !== 'undefined' ? tournamentsAPI.getAll() : [],
+                    typeof matchesAPI !== 'undefined' ? matchesAPI.getAll() : []
+                ]);
+
+                if (!org || !org.id) {
+                    root.innerHTML = '<p class="organizer-profile-empty">Организатор не найден.</p>';
+                    return;
+                }
+
+                const tourList = Array.isArray(tournaments) ? tournaments : (tournaments && tournaments.data ? tournaments.data : []);
+                const matchList = Array.isArray(matches) ? matches : (matches && matches.data ? matches.data : []);
+
+                const orgTournaments = tourList.filter(t =>
+                    (t.organizer_id != null && String(t.organizer_id) === String(org.id)) ||
+                    (t.organizerId != null && String(t.organizerId) === String(org.id))
+                );
+                const orgMatches = matchList.filter(m =>
+                    (m.organizer_id != null && String(m.organizer_id) === String(org.id)) ||
+                    (m.organizerId != null && String(m.organizerId) === String(org.id))
+                );
+
+                const links = parseSocialLinks(org.social_links || org.socialLinks);
+                const socialNames = {
+                    twitter: 'Twitter / X',
+                    twitch: 'Twitch',
+                    vk: 'VK',
+                    telegram: 'Telegram',
+                    youtube: 'YouTube',
+                    instagram: 'Instagram',
+                    discord: 'Discord'
+                };
+                const socialHtml = Object.entries(links)
+                    .filter(([k, v]) => v && String(v).trim())
+                    .map(([key, url]) => {
+                        const label = socialNames[key] || key;
+                        const u = String(url).trim();
+                        const href = u.startsWith('http') ? u : 'https://' + u;
+                        return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(label)}</a>`;
+                    })
+                    .join('');
+
+                const desc = org.description || org.full_info || org.short_info;
+
+                const tournamentsHtml = orgTournaments.length === 0
+                    ? '<p class="organizer-profile-empty">Пока нет турниров, привязанных к этому организатору.</p>'
+                    : `<ul class="organizer-profile-tournaments-list">
+                        ${orgTournaments.map(t => {
+                            const start = t.date_start ? new Date(t.date_start).toLocaleDateString('ru-RU') : '—';
+                            const end = t.date_end ? new Date(t.date_end).toLocaleDateString('ru-RU') : '—';
+                            const prize = t.prize || '—';
+                            const teams = t.teams_count != null ? t.teams_count + ' команд' : '—';
+                            const stage = t.stage || '';
+                            return `<li>
+                                <div class="organizer-profile-tournament-title">${escapeHtml(t.title || 'Турнир')}</div>
+                                <div class="organizer-profile-tournament-meta">
+                                    ${escapeHtml(prize)} • ${escapeHtml(teams)} • ${escapeHtml(start)} — ${escapeHtml(end)}${stage ? ' • ' + escapeHtml(stage) : ''}
+                                </div>
+                            </li>`;
+                        }).join('')}
+                    </ul>`;
+
+                const matchesHtml = orgMatches.length === 0
+                    ? '<p class="organizer-profile-empty">Матчи этого организатора появятся позже.</p>'
+                    : `<ul class="organizer-profile-matches-list">
+                        ${orgMatches.slice(0, 30).map(m => {
+                            const date = m.date_time ? new Date(m.date_time).toLocaleString('ru-RU') : '—';
+                            const teams = `${m.team1_name || '—'} vs ${m.team2_name || '—'}`;
+                            const status = (m.status || '').toLowerCase();
+                            return `<li>
+                                <span>${escapeHtml(teams)}</span><br>
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(date)} • ${escapeHtml(status || '—')}</span>
+                            </li>`;
+                        }).join('')}
+                    </ul>`;
+
+                const totalMatches = orgMatches.length;
+                const totalTournaments = orgTournaments.length;
+
+                root.innerHTML = `
+                    <div class="organizer-profile-header">
+                        <img src="${escapeHtml(org.logo || DEFAULT_LOGO)}"
+                             alt="Логотип организатора"
+                             class="organizer-profile-logo"
+                             onerror="this.src='${DEFAULT_LOGO}'">
+                        <div class="organizer-profile-main">
+                            <span class="organizer-profile-badge">Профиль организатора</span>
+                            <h1 class="organizer-profile-name">${escapeHtml(org.name || 'Организатор')}</h1>
+                            ${org.short_info ? `<p class="organizer-profile-tagline">${escapeHtml(org.short_info)}</p>` : ''}
+                            <div class="organizer-profile-meta">
+                                <span>ID: ${escapeHtml(String(org.id))}</span>
+                                ${totalTournaments ? `<span>${escapeHtml(String(totalTournaments))} турниров</span>` : ''}
+                                ${totalMatches ? `<span>${escapeHtml(String(totalMatches))} матчей</span>` : ''}
+                            </div>
+                            ${socialHtml ? `<div class="organizer-profile-social">${socialHtml}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="organizer-profile-grid">
+                        <div>
+                            <div class="organizer-profile-card">
+                                <div class="organizer-profile-card-title">Описание</div>
+                                ${desc
+                                    ? `<div class="organizer-profile-description">${escapeHtml(desc)}</div>`
+                                    : '<p class="organizer-profile-empty">Описание пока не заполнено.</p>'
+                                }
+                            </div>
+                            <div class="organizer-profile-card">
+                                <div class="organizer-profile-card-title">Статистика</div>
+                                <div class="organizer-profile-stats">
+                                    <span class="organizer-profile-stat-pill"><strong>${escapeHtml(String(totalTournaments))}</strong>турниров</span>
+                                    <span class="organizer-profile-stat-pill"><strong>${escapeHtml(String(totalMatches))}</strong>матчей</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="organizer-profile-card">
+                                <div class="organizer-profile-card-title">Проведённые турниры</div>
+                                ${tournamentsHtml}
+                            </div>
+                            <div class="organizer-profile-card" style="margin-top: 1.25rem;">
+                                <div class="organizer-profile-card-title">Последние матчи</div>
+                                ${matchesHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                console.error('Ошибка загрузки профиля организатора:', e);
+                root.innerHTML = '<p class="organizer-profile-empty">Ошибка загрузки профиля. Убедитесь, что сервер запущен.</p>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadOrganizerProfile);
+    </script>
+</body>
+</html>
+

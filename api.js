@@ -1,5 +1,18 @@
 // API функции для работы с сервером
-const API_BASE_URL = 'http://95.81.122.36:3000/api';
+// При открытии через сервер (http://127.0.0.1:3000 или прод-хост) используем текущий origin.
+// При открытии как file:// fallback на прод-адрес.
+const API_BASE_URL = (() => {
+    try {
+        if (typeof window !== 'undefined' && window.location) {
+            const origin = window.location.origin;
+            const protocol = window.location.protocol;
+            if (origin && origin !== 'null' && protocol !== 'file:') {
+                return `${origin}/api`;
+            }
+        }
+    } catch (_) {}
+    return 'http://95.81.122.36:3000/api';
+})();
 
 // Общая функция для запросов
 async function apiRequest(endpoint, options = {}) {
@@ -119,6 +132,8 @@ const bannersAPI = {
         method: 'DELETE'
     })
 };
+
+
 
 // ДЕТАЛИ КОМАНД
 const teamDetailsAPI = {

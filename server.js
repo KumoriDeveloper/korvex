@@ -47,6 +47,34 @@ const bannersUpload = multer({
     limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 });
 
+// Хранилище для логотипов команд (img/teams)
+const teamsUploadDir = path.join(__dirname, 'img', 'teams');
+try {
+    if (!fs.existsSync(teamsUploadDir)) {
+        fs.mkdirSync(teamsUploadDir, { recursive: true });
+    }
+} catch (e) {
+    console.error('Не удалось создать директорию для логотипов команд:', e);
+}
+
+const teamsStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, teamsUploadDir);
+    },
+    filename: function (req, file, cb) {
+        const ext = path.extname(file.originalname || '').toLowerCase() || '.png';
+        const base = 'team_' + Date.now() + '_' + Math.round(Math.random() * 1e6);
+        cb(null, base + ext);
+    }
+});
+
+const teamsUpload = multer({
+    storage: teamsStorage,
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+});
+
+
+
 // Прокси для картинок (баннеры): решает mixed-content и блокировки hotlink.
 // Использование: /api/image-proxy?url=https%3A%2F%2F...
 app.get('/api/image-proxy', (req, res) => {
@@ -270,9 +298,35 @@ app.get('/api/teams/export.csv', (req, res) => {
     });
 });
 
-app.post('/api/teams', (req, res) => {
+app.post('/api/teams', teamsUpload.single('teamLogo'), (req, res) => {
     const db = getDB();
-    const { captainName, email, tg_contact, teamName, teamLogo, teamDescription, teamMembers, status } = req.body;
+    const isJson = (req.headers['content-type'] || '').includes('application/json');
+
+    let captainName, email, tg_contact, teamName, teamLogo, teamDescription, teamMembers, status;
+
+    if (isJson) {
+        ({ captainName, email, tg_contact, teamName, teamLogo, teamDescription, teamMembers, status } = req.body || {});
+    } else {
+        const body = req.body || {};
+        captainName = body.captainName;
+        email = body.email;
+        tg_contact = body.tg_contact;
+        teamName = body.teamName;
+        teamDescription = body.teamDescription;
+        status = body.status || 'pending';
+        try {
+            teamMembers = body.teamMembers ? JSON.parse(body.teamMembers) : [];
+        } catch (e) {
+            teamMembers = [];
+        }
+        teamLogo = body.teamLogo;
+    }
+
+    // Если загружен файл логотипа — используем его относительный путь
+    if (req.file) {
+        teamLogo = '/img/teams/' + req.file.filename;
+    }
+
     const membersStr = serializeTeamMembers(teamMembers);
     const sql = "INSERT INTO teams (captain_name, email, tg_contact, team_name, team_logo, team_description, team_members, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     db.run(sql, [captainName || '', email || '', tg_contact || null, teamName, teamLogo || null, teamDescription || null, membersStr, status || 'pending'], function(err) {
@@ -569,6 +623,8 @@ app.get('/api/organizers', (req, res) => {
         }
     });
 });
+
+
 
 app.get('/api/organizers/:id', (req, res) => {
     const db = getDB();

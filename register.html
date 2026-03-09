@@ -128,8 +128,11 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Логотип команды (URL)</label>
-                    <input type="url" name="teamLogo" placeholder="https://example.com/logo.png">
+                    <label>Логотип команды (файл PNG / JPG)</label>
+                    <input type="file" name="teamLogo" accept="image/*">
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.35rem;">
+                        Загрузите квадратное изображение с логотипом команды. Если не загрузите файл, будет использован дефолтный аватар.
+                    </p>
                 </div>
                 
                 <div class="form-group">
@@ -169,9 +172,31 @@
         </div>
     </div>
 
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__brand">
+                    <span class="logo__icon">◈</span>
+                    <span>Korvex</span>
+                </div>
+                <div class="footer__links">
+                    <a href="about.html">О нас</a>
+                    <a href="contacts.html">Контакты</a>
+                    <a href="rules.html">Правила</a>
+                </div>
+                <div class="footer__social">
+                    <a href="https://t.me/korvexhub">Telegram</a>
+                    <a href="#">Twitch</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+            <p class="footer__copy">© 2026 Korvex. Все права защищены.</p>
+        </div>
+    </footer>
+
     <script src="api.js"></script>
     <script>
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = new FormData(this);
@@ -181,30 +206,25 @@
                 if (name) teamMembers.push({ name: name });
             }
             
-            const teamData = {
-                captainName: formData.get('captainName'),
-                tg_contact: (formData.get('tg_contact') || '').trim(),
-                teamName: formData.get('teamName'),
-                teamLogo: formData.get('teamLogo') || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + encodeURIComponent(formData.get('teamName')),
-                teamDescription: formData.get('teamDescription'),
-                teamMembers: teamMembers,
-                status: 'pending'
-            };
-            
             if (teamMembers.length < 5) {
                 alert('Укажите всех 5 игроков команды.');
                 return;
             }
-            
-            teamsAPI.create({
-                captainName: teamData.captainName,
-                tg_contact: teamData.tg_contact,
-                teamName: teamData.teamName,
-                teamLogo: teamData.teamLogo,
-                teamDescription: teamData.teamDescription,
-                teamMembers: teamData.teamMembers,
-                status: teamData.status
-            }).then(() => {
+
+            // Упаковать состав команды и статус в FormData (как JSON-строку)
+            formData.append('teamMembers', JSON.stringify(teamMembers));
+            formData.append('status', 'pending');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/teams`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+
                 // Показать сообщение об успехе
                 document.getElementById('successMessage').classList.add('show');
                 this.reset();
@@ -212,10 +232,10 @@
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 2000);
-            }).catch(error => {
+            } catch (error) {
                 console.error('Ошибка регистрации команды:', error);
                 alert('Ошибка при отправке заявки. Убедитесь, что сервер запущен.');
-            });
+            }
         });
     </script>
 </body>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Правила — Korvex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/korvex/favicon.ico" type="image/x-icon">
+    <style>
+        .rules-page {
+            padding: 3rem 0 4rem;
+        }
+        .rules-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            padding: 1.75rem 1.9rem;
+            box-shadow: var(--shadow);
+            max-width: 860px;
+        }
+        .rules-card h2 {
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+        }
+        .rules-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        .rules-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .rules-list li:last-child {
+            border-bottom: none;
+        }
+        .rules-note {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header__container">
+            <a href="index.html" class="logo">
+                <span class="logo__icon">◈</span>
+                <span class="logo__text">Korvex</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html#matches" class="nav__link">Матчи</a>
+                <a href="rankings.html" class="nav__link">Рейтинг</a>
+                <a href="index.html#tournaments" class="nav__link">Турниры</a>
+                <a href="organizers.html" class="nav__link">Организаторы</a>
+            </nav>
+            <div class="header__actions">
+                <a href="register.html" class="btn btn--primary">Создать команду</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="section">
+            <div class="container rules-page">
+                <div class="static-page-header">
+                    <h1 class="static-page-title">Правила платформы</h1>
+                    <p class="static-page-subtitle">
+                        Базовые принципы участия команд, подачи заявок и проведения турниров на Korvex.
+                    </p>
+                </div>
+
+                <div class="rules-card">
+                    <h2>Общие положения</h2>
+                    <ul class="rules-list">
+                        <li>1. Команда несёт ответственность за корректность указанного названия, состава и контактных данных.</li>
+                        <li>2. Организаторы турниров оставляют за собой право отклонять заявки без объяснения причин.</li>
+                        <li>3. Дублирующие или фейковые команды могут быть удалены из рейтинга и турнирных сеток.</li>
+                        <li>4. Все споры по результатам матчей решаются через ответственных организаторов турнира.</li>
+                        <li>5. Использование читов и другого запрещённого ПО ведёт к дисквалификации команды.</li>
+                    </ul>
+                    <p class="rules-note">
+                        Подробный регламент каждого турнира (формат, тайминг, дисциплина, технические требования)
+                        публикуется на отдельной странице турнира и может отличаться от общих правил платформы.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__brand">
+                    <span class="logo__icon">◈</span>
+                    <span>Korvex</span>
+                </div>
+                <div class="footer__links">
+                    <a href="about.html">О нас</a>
+                    <a href="contacts.html">Контакты</a>
+                    <a href="rules.html">Правила</a>
+                </div>
+                <div class="footer__social">
+                    <a href="https://t.me/korvexhub">Telegram</a>
+                    <a href="#">Twitch</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+            <p class="footer__copy">© 2026 Korvex. Все права защищены.</p>
+        </div>
+    </footer>
+</body>
+</html>
+

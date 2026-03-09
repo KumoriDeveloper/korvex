@@ -10,85 +10,196 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="/korvex/favicon.ico" type="image/x-icon">
     <style>
-        .organizers-page { padding: 2rem 0; }
+        .organizers-page {
+            padding: 2rem 0 3rem;
+        }
+        .organizers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
         .organizer-card {
-            background: var(--bg-card);
+            position: relative;
+            background: radial-gradient(circle at top left, rgba(59,130,246,0.16), transparent 55%), var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius-xl);
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 1.5rem 1.6rem 1.3rem;
             box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        }
+        .organizer-card::after {
+            content: 'Профиль →';
+            position: absolute;
+            right: 1.6rem;
+            bottom: 1.2rem;
+            font-size: 0.8rem;
+            color: var(--accent);
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+        .organizer-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            background: radial-gradient(circle at top left, rgba(59,130,246,0.22), transparent 60%), var(--bg-card-hover);
+            box-shadow: var(--shadow-lg);
+        }
+        .organizer-card:hover::after {
+            opacity: 1;
+            transform: translateY(0);
         }
         .organizer-card__header {
             display: flex;
             align-items: flex-start;
-            gap: 1.5rem;
+            gap: 1.4rem;
             flex-wrap: wrap;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
         .organizer-card__logo {
-            width: 80px;
-            height: 80px;
+            width: 72px;
+            height: 72px;
             object-fit: contain;
             border-radius: var(--radius-lg);
             background: var(--bg-tertiary);
             border: 1px solid var(--border);
         }
-        .organizer-card__main { flex: 1; min-width: 200px; }
-        .organizer-card__name { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .organizer-card__info { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1rem; }
+        .organizer-card__main {
+            flex: 1;
+            min-width: 200px;
+        }
+        .organizer-card__name-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 0.3rem;
+        }
+        .organizer-card__name {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .organizer-card__badge {
+            padding: 0.2rem 0.65rem;
+            border-radius: 999px;
+            background: rgba(15,23,42,0.9);
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+        }
+        .organizer-card__info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 0.6rem;
+            max-height: 3.2em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
         .organizer-card__social {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.4rem;
             flex-wrap: wrap;
         }
         .organizer-card__social a {
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
-            padding: 0.4rem 0.75rem;
+            padding: 0.35rem 0.7rem;
             background: var(--bg-tertiary);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            font-size: 0.8rem;
+            transition: all 0.15s;
         }
         .organizer-card__social a:hover {
             border-color: var(--accent);
             color: var(--accent);
         }
+        .organizer-card__bottom {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1.25rem;
+            margin-top: 0.75rem;
+        }
         .organizer-card__stats {
             display: flex;
-            gap: 1.5rem;
-            margin-bottom: 1.25rem;
+            gap: 0.75rem;
             flex-wrap: wrap;
         }
         .organizer-card__stat {
-            padding: 0.5rem 1rem;
+            padding: 0.45rem 0.9rem;
             background: var(--bg-tertiary);
             border-radius: var(--radius-md);
             font-family: var(--font-mono);
             font-weight: 600;
             color: var(--accent);
+            font-size: 0.85rem;
         }
-        .organizer-card__stat span { color: var(--text-muted); font-weight: 400; font-family: var(--font-sans); font-size: 0.85rem; }
-        .organizer-card__tournaments-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; }
-        .organizer-tournaments-list { list-style: none; padding: 0; margin: 0; }
+        .organizer-card__stat span {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            margin-left: 0.2rem;
+        }
+        .organizer-card__tournaments {
+            flex: 1;
+            min-width: 180px;
+        }
+        .organizer-card__tournaments-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+            color: var(--text-secondary);
+        }
+        .organizer-tournaments-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
         .organizer-tournaments-list li {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid var(--border);
+            padding: 0.45rem 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 0.35rem;
         }
-        .organizer-tournaments-list li:last-child { border-bottom: none; }
-        .organizer-tournaments-list .t-title { font-weight: 600; }
-        .organizer-tournaments-list .t-meta { font-size: 0.85rem; color: var(--text-muted); }
-        .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+        .organizer-tournaments-list li:last-child {
+            border-bottom: none;
+        }
+        .organizer-tournaments-list .t-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .organizer-tournaments-list .t-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 640px) {
+            .organizer-card {
+                padding: 1.25rem 1.25rem 1.1rem;
+            }
+            .organizer-card__bottom {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
@@ -102,7 +213,7 @@
                 <a href="index.html#matches" class="nav__link">Матчи</a>
                 <a href="rankings.html" class="nav__link">Рейтинг</a>
                 <a href="index.html#tournaments" class="nav__link">Турниры</a>
-                <a href="index.html#news" class="nav__link">Новости</a>
+                  
                 <a href="organizers.html" class="nav__link active">Организаторы</a>
             </nav>
             <div class="header__actions">
@@ -118,7 +229,7 @@
                     <h2 class="section__title">Организаторы</h2>
                     <p class="section__subtitle" style="color: var(--text-muted); margin-top: 0.5rem;">Действующие организаторы турниров и матчей</p>
                 </div>
-                <div id="organizersList"></div>
+                <div id="organizersList" class="organizers-grid"></div>
             </div>
         </section>
     </main>
@@ -131,13 +242,12 @@
                     <span>Korvex</span>
                 </div>
                 <div class="footer__links">
-                    <a href="#">О нас</a>
-                    <a href="#">Контакты</a>
-                    <a href="#">Правила</a>
-                    <a href="#">Партнёры</a>
+                    <a href="about.html">О нас</a>
+                    <a href="contacts.html">Контакты</a>
+                    <a href="rules.html">Правила</a>
                 </div>
                 <div class="footer__social">
-                    <a href="#">Twitter</a>
+                    <a href="https://t.me/korvexhub">Telegram</a>
                     <a href="#">Twitch</a>
                     <a href="#">YouTube</a>
                 </div>
@@ -195,9 +305,9 @@
                     }).join('');
 
                     const tournamentsHtml = orgTournaments.length === 0
-                        ? '<p class="organizer-tournaments-list" style="color: var(--text-muted);">Турниров пока нет</p>'
+                        ? '<p class="organizer-profile-empty" style="color: var(--text-muted); font-size: 0.85rem;">Турниров пока нет</p>'
                         : `<ul class="organizer-tournaments-list">
-                            ${orgTournaments.map(t => {
+                            ${orgTournaments.slice(0, 3).map(t => {
                                 const start = t.date_start ? new Date(t.date_start).toLocaleDateString('ru-RU') : '—';
                                 const end = t.date_end ? new Date(t.date_end).toLocaleDateString('ru-RU') : '—';
                                 const prize = t.prize || '—';
@@ -213,24 +323,40 @@
                         </ul>`;
 
                     return `
-                        <div class="organizer-card">
+                        <div class="organizer-card" data-id="${org.id != null ? String(org.id) : ''}">
                             <div class="organizer-card__header">
                                 <img src="${escapeHtml(org.logo || DEFAULT_LOGO)}" alt="" class="organizer-card__logo" onerror="this.src='${DEFAULT_LOGO}'">
                                 <div class="organizer-card__main">
-                                    <h3 class="organizer-card__name">${escapeHtml(org.name || 'Организатор')}</h3>
+                                    <div class="organizer-card__name-row">
+                                        <h3 class="organizer-card__name">${escapeHtml(org.name || 'Организатор')}</h3>
+                                        <span class="organizer-card__badge">Организатор</span>
+                                    </div>
                                     ${org.short_info ? `<p class="organizer-card__info">${escapeHtml(org.short_info)}</p>` : ''}
                                     ${socialHtml ? `<div class="organizer-card__social">${socialHtml}</div>` : ''}
                                 </div>
                             </div>
-                            <div class="organizer-card__stats">
-                                <span class="organizer-card__stat">${orgMatches.length} <span>матчей</span></span>
-                                <span class="organizer-card__stat">${orgTournaments.length} <span>турниров</span></span>
+                            <div class="organizer-card__bottom">
+                                <div class="organizer-card__stats">
+                                    <span class="organizer-card__stat">${orgMatches.length} <span>матчей</span></span>
+                                    <span class="organizer-card__stat">${orgTournaments.length} <span>турниров</span></span>
+                                </div>
+                                <div class="organizer-card__tournaments">
+                                    <div class="organizer-card__tournaments-title">Последние турниры</div>
+                                    ${tournamentsHtml}
+                                </div>
                             </div>
-                            <div class="organizer-card__tournaments-title">Проведённые турниры</div>
-                            ${tournamentsHtml}
                         </div>
                     `;
                 }).join('');
+
+                // Клик по карточке — переход на страницу профиля организатора
+                container.addEventListener('click', (e) => {
+                    const card = e.target.closest('.organizer-card');
+                    if (!card || !container.contains(card)) return;
+                    const id = card.dataset.id;
+                    if (!id) return;
+                    window.location.href = `organizer-profile.html?id=${encodeURIComponent(id)}`;
+                });
             } catch (e) {
                 console.error('Ошибка загрузки организаторов:', e);
                 container.innerHTML = '<div class="empty-state">Ошибка загрузки. Убедитесь, что сервер запущен.</div>';

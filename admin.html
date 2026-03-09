@@ -955,6 +955,8 @@
                 <div id="bottomBannersList" class="banner-preview"></div>
             </div>
         </div>
+
+        
     </div>
 
     <script src="api.js"></script>
@@ -2497,6 +2499,7 @@
                 document.querySelectorAll('.admin-tab').forEach(tab => {
                     if (tab.textContent.includes('Модерация') && tabName === 'moderation') tab.classList.add('active');
                     if (tab.textContent.includes('Редактирование команд') && tabName === 'teams') tab.classList.add('active');
+                    if (tab.textContent.toLowerCase().includes('татистик') && tabName === 'stats') tab.classList.add('active');
                     if (tab.textContent.includes('Детали команд') && tabName === 'team-details') tab.classList.add('active');
                     if (tab.textContent.includes('Редактор игроков') && tabName === 'players-editor') tab.classList.add('active');
                     if (tab.textContent.includes('Организаторы') && tabName === 'organizers') tab.classList.add('active');
@@ -2509,6 +2512,8 @@
             // Загрузить данные при переключении на вкладку
             if (tabName === 'team-details') {
                 loadTeamDetailsList();
+            } else if (tabName === 'stats') {
+                loadStats();
             } else if (tabName === 'news') {
                 loadNews();
             } else if (tabName === 'teams') {

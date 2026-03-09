@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О нас — Korvex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/korvex/favicon.ico" type="image/x-icon">
+    <style>
+        .static-page {
+            padding: 3rem 0 4rem;
+        }
+        .static-page-header {
+            margin-bottom: 1.5rem;
+        }
+        .static-page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .static-page-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        .static-page-content {
+            max-width: 760px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        .static-page-content p + p {
+            margin-top: 0.9rem;
+        }
+        .static-page-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.5fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .static-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            padding: 1.5rem 1.75rem;
+            box-shadow: var(--shadow);
+        }
+        .static-card h3 {
+            font-size: 1.05rem;
+            margin-bottom: 0.75rem;
+        }
+        .static-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .static-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.93rem;
+        }
+        .static-list li:last-child {
+            border-bottom: none;
+        }
+        .static-tag {
+            display: inline-block;
+            padding: 0.18rem 0.55rem;
+            border-radius: 999px;
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.6rem;
+        }
+        @media (max-width: 900px) {
+            .static-page-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header__container">
+            <a href="index.html" class="logo">
+                <span class="logo__icon">◈</span>
+                <span class="logo__text">Korvex</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html#matches" class="nav__link">Матчи</a>
+                <a href="rankings.html" class="nav__link">Рейтинг</a>
+                <a href="index.html#tournaments" class="nav__link">Турниры</a>
+                <a href="organizers.html" class="nav__link">Организаторы</a>
+            </nav>
+            <div class="header__actions">
+                <a href="register.html" class="btn btn--primary">Создать команду</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="section">
+            <div class="container static-page">
+                <div class="static-page-header">
+                    <div class="static-tag">О платформе</div>
+                    <h1 class="static-page-title">О нас</h1>
+                    <p class="static-page-subtitle">
+                        Korvex — площадка для рейтингов, турниров и статистики киберспортивных команд.
+                    </p>
+                </div>
+
+                <div class="static-page-grid">
+                    <div class="static-card">
+                        <h3>Что такое Korvex</h3>
+                        <div class="static-page-content">
+                            <p>
+                                Korvex объединяет турниры, матчи и рейтинг команд в одном месте. Мы помогаем
+                                игрокам и организаторам удобно взаимодействовать: подавать заявки, отслеживать
+                                результаты и строить честный рейтинг на основе сыгранных матчей.
+                            </p>
+                            <p>
+                                Платформа создавалась как инструмент для локальных и онлайн‑лиг, но архитектура
+                                позволяет масштабировать систему под крупные события и серии турниров.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="static-card">
+                        <h3>Наши фокусы</h3>
+                        <ul class="static-list">
+                            <li>Честный рейтинг, завязанный на реальные результаты матчей.</li>
+                            <li>Удобные заявки команд и простая модерация для организаторов.</li>
+                            <li>Понятные страницы турниров, матчей и профилей команд.</li>
+                            <li>Гибкая система форматов турниров: Single / Double Elim, Swiss.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__brand">
+                    <span class="logo__icon">◈</span>
+                    <span>Korvex</span>
+                </div>
+                <div class="footer__links">
+                    <a href="about.html">О нас</a>
+                    <a href="contacts.html">Контакты</a>
+                    <a href="rules.html">Правила</a>
+                </div>
+                <div class="footer__social">
+                    <a href="https://t.me/korvexhub">Telegram</a>
+                    <a href="#">Twitch</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+            <p class="footer__copy">© 2026 Korvex. Все права защищены.</p>
+        </div>
+    </footer>
+</body>
+</html>
+

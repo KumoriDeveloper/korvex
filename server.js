@@ -73,6 +73,32 @@ const teamsUpload = multer({
     limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 });
 
+// Хранилище для логотипов организаторов (img/organizers)
+const organizersUploadDir = path.join(__dirname, 'img', 'organizers');
+try {
+    if (!fs.existsSync(organizersUploadDir)) {
+        fs.mkdirSync(organizersUploadDir, { recursive: true });
+    }
+} catch (e) {
+    console.error('Не удалось создать директорию для логотипов организаторов:', e);
+}
+
+const organizersStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, organizersUploadDir);
+    },
+    filename: function (req, file, cb) {
+        const ext = path.extname(file.originalname || '').toLowerCase() || '.png';
+        const base = 'organizer_' + Date.now() + '_' + Math.round(Math.random() * 1e6);
+        cb(null, base + ext);
+    }
+});
+
+const organizersUpload = multer({
+    storage: organizersStorage,
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+});
+
 
 
 // Прокси для картинок (баннеры): решает mixed-content и блокировки hotlink.
@@ -621,6 +647,20 @@ app.get('/api/organizers', (req, res) => {
         } else {
             res.json(rows);
         }
+    });
+});
+
+// Загрузка логотипа организатора как файла (multipart/form-data)
+// Принимает поле "file", возвращает относительный путь к картинке.
+app.post('/api/organizers/upload-logo', organizersUpload.single('file'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'File is required' });
+    }
+    const relativePath = '/img/organizers/' + req.file.filename;
+    res.json({
+        logo: relativePath,
+        path: relativePath,
+        url: relativePath
     });
 });
 

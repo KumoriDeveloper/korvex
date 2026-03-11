@@ -157,7 +157,31 @@ const organizersAPI = {
     }),
     delete: (id) => apiRequest(`/organizers/${id}`, {
         method: 'DELETE'
-    })
+    }),
+    uploadLogo: async (file) => {
+        const fd = new FormData();
+        fd.append('file', file);
+        // Для загрузки файла жёстко привязываемся к текущему origin,
+        // чтобы всегда идти на тот же хост, откуда открыта админка.
+        let base;
+        try {
+            if (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null') {
+                base = window.location.origin;
+            }
+        } catch (_) {}
+        if (!base) {
+            // Fallback: вырезаем "/api" из API_BASE_URL, если оно там есть
+            base = API_BASE_URL.replace(/\/api$/, '');
+        }
+        const response = await fetch(`${base}/api/organizers/upload-logo`, {
+            method: 'POST',
+            body: fd
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    }
 };
 
 // МАТЧИ (главная страница)

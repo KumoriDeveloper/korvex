@@ -834,7 +834,12 @@
                         <div class="form-group">
                             <label>Лого (URL)</label>
                             <input type="url" name="logo" placeholder="https://...">
+                            <small style="color: var(--text-muted); font-size: 0.85rem;">Можно указать внешний URL или загрузить файл ниже.</small>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Логотип (файл)</label>
+                        <input type="file" name="logoFile" accept="image/*">
                     </div>
                     <div class="form-group">
                         <label>Краткая информация</label>
@@ -3013,10 +3018,26 @@
                 social_links = null;
             }
             try {
+                // Базовый URL логотипа из текстового поля
+                let logoUrl = fd.get('logo') || null;
+                const fileInput = this.querySelector('input[name="logoFile"]');
+                const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+
+                // Если выбран файл — пробуем загрузить его, но не ломаем создание при ошибке загрузки
+                if (file) {
+                    try {
+                        const uploaded = await organizersAPI.uploadLogo(file);
+                        logoUrl = (uploaded && (uploaded.logo || uploaded.path || uploaded.url)) || logoUrl;
+                    } catch (uploadErr) {
+                        console.error('Ошибка загрузки логотипа организатора:', uploadErr);
+                        alert('Не удалось загрузить файл логотипа. Организатор будет сохранён без него или с URL из поля.');
+                    }
+                }
+
                 await organizersAPI.create({
                     name: fd.get('name'),
                     short_info: fd.get('short_info') || null,
-                    logo: fd.get('logo') || null,
+                    logo: logoUrl || null,
                     social_links: social_links
                 });
                 this.reset();
@@ -3024,8 +3045,8 @@
                 if (document.getElementById('matchOrganizerSelect')) loadOrganizerSelects();
                 alert('Организатор добавлен');
             } catch (err) {
-                console.error(err);
-                alert('Ошибка добавления организатора');
+                console.error('Ошибка добавления организатора:', err);
+                alert('Ошибка добавления организатора: ' + (err && err.message ? err.message : 'см. консоль'));
             }
         });
 

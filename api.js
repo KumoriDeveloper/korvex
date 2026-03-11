@@ -161,24 +161,20 @@ const organizersAPI = {
     uploadLogo: async (file) => {
         const fd = new FormData();
         fd.append('file', file);
-        // Для загрузки файла жёстко привязываемся к текущему origin,
-        // чтобы всегда идти на тот же хост, откуда открыта админка.
-        let base;
-        try {
-            if (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null') {
-                base = window.location.origin;
-            }
-        } catch (_) {}
-        if (!base) {
-            // Fallback: вырезаем "/api" из API_BASE_URL, если оно там есть
-            base = API_BASE_URL.replace(/\/api$/, '');
-        }
-        const response = await fetch(`${base}/api/organizers/upload-logo`, {
+        // Используем тот же API_BASE_URL, что и для остальных запросов:
+        // локально → 127.0.0.1:3000/api, прод → 95.81.122.36:3000/api.
+        const uploadUrl = `${API_BASE_URL.replace(/\/$/, '')}/organizers/upload-logo`;
+        const response = await fetch(uploadUrl, {
             method: 'POST',
             body: fd
         });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            let msg = `HTTP error! status: ${response.status}`;
+            try {
+                const body = await response.json();
+                if (body && (body.error || body.message)) msg = body.error || body.message;
+            } catch (_) {}
+            throw new Error(msg);
         }
         return await response.json();
     }

@@ -153,9 +153,9 @@ async function loadBanners() {
             leftBanner.innerHTML = banners.left.map(banner => 
                 `<div class="banner__item">
                     <a href="${banner.link_url || '#'}" target="_blank">
-                        <img src="${proxiedImg(banner.image_url) || 'https://via.placeholder.com/160x600?text=Реклама'}"
+                        <img src="${proxiedImg(banner.image_url) || 'https://via.placeholder.com/220x275?text=Реклама'}"
                              alt="Реклама"
-                             onerror="this.onerror=null;this.src='https://via.placeholder.com/160x600?text=Реклама';">
+                             onerror="this.onerror=null;this.src='https://via.placeholder.com/220x275?text=Реклама';">
                     </a>
                 </div>`
             ).join('');
@@ -165,9 +165,9 @@ async function loadBanners() {
             rightBanner.innerHTML = banners.right.map(banner => 
                 `<div class="banner__item">
                     <a href="${banner.link_url || '#'}" target="_blank">
-                        <img src="${proxiedImg(banner.image_url) || 'https://via.placeholder.com/160x600?text=Реклама'}"
+                        <img src="${proxiedImg(banner.image_url) || 'https://via.placeholder.com/220x275?text=Реклама'}"
                              alt="Реклама"
-                             onerror="this.onerror=null;this.src='https://via.placeholder.com/160x600?text=Реклама';">
+                             onerror="this.onerror=null;this.src='https://via.placeholder.com/220x275?text=Реклама';">
                     </a>
                 </div>`
             ).join('');

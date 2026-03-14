@@ -84,7 +84,7 @@ body {
 
 .banner__item img {
     width: 100%;
-    height: auto;
+    height: 275px;
     max-height: 275px;
     display: block;
     object-fit: cover;

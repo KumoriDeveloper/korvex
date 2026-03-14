@@ -79,25 +79,17 @@ body {
 
 .banner__item {
     width: 100%;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
     overflow: hidden;
-    transition: all var(--transition);
-}
-
-.banner__item:hover {
-    border-color: var(--border-hover);
 }
 
 .banner__item img {
     width: 100%;
-    height: 275px;
+    height: auto;
     max-height: 275px;
     display: block;
-    object-fit: contain;
+    object-fit: cover;
     object-position: center;
-    background: var(--bg-tertiary);
+    background: transparent;
 }
 
 .banner__item a {

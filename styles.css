@@ -61,7 +61,7 @@ body {
 .banner {
     position: fixed;
     top: 80px;
-    width: 220px;
+    width: 240px;
     z-index: 10;
     display: flex;
     flex-direction: column;
@@ -85,7 +85,7 @@ body {
 .banner__item img {
     width: 100%;
     height: auto;
-    max-width: 220px;
+    max-width: 240px;
     max-height: 275px;
     display: block;
     object-fit: contain;
@@ -112,7 +112,7 @@ body {
 }
 
 .banner-preview-item img {
-    max-width: 220px;
+    max-width: 240px;
     max-height: 275px;
     border-radius: var(--radius-sm);
 }
@@ -129,8 +129,8 @@ body {
 }
 
 .main {
-    margin-left: 260px;
-    margin-right: 260px;
+    margin-left: 280px;
+    margin-right: 280px;
 }
 
 @media (max-width: 1400px) {
